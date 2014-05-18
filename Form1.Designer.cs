@@ -68,11 +68,13 @@
             this.ClientSize = new System.Drawing.Size(1007, 534);
             this.Name = "FrmMain";
             this.Text = "Comic Reader";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.FrmMain_Paint);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.FrmMain_KeyDown);
             this.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.FrmMain_KeyPress);
             this.KeyUp += new System.Windows.Forms.KeyEventHandler(this.FrmMain_KeyUp);
-            this.Resize += new System.EventHandler(this.FrmMain_Resize);
             this.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.FrmMain_MouseWheel);
+            this.Resize += new System.EventHandler(this.FrmMain_Resize);
             this.contextMenuStrip2.ResumeLayout(false);
             this.ResumeLayout(false);
 

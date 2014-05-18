@@ -25,12 +25,16 @@ namespace comicReader.NET
         int currentVerticalPosition = 0;
         int currentHorizontalPosition = 0;
         ArchiveReader archiveReader;
+        Manga currentManga;
 
         public FrmMain()
         {
             InitializeComponent();
 
-            archiveReader = new ArchiveReader(@"f:\mieiProgrammi\comicReader.NET\testImages\");
+            currentManga = new Manga();
+            currentManga.path = @"f:\mieiProgrammi\comicReader.NET\testImages\arthur";
+
+            archiveReader = new ArchiveReader(currentManga.path);
             originalBitmap = new Bitmap(new System.IO.MemoryStream(archiveReader.GetCurrentFile()));
             this.BackColor = Color.Black;
             ResizeImage();
@@ -50,9 +54,21 @@ namespace comicReader.NET
 
                 graphics.DrawImage(originalBitmap, 0, 0, resizedBitmap.Width, resizedBitmap.Height);
             }
+
+            SetWindowTitle(archiveReader.GetCurrentFileName());
         }
 
         private void FrmMain_KeyUp(object sender, KeyEventArgs e)
+        {
+
+        }
+
+        private void SetWindowTitle(string title)
+        {
+            Text = "Comic Reader - " + title;
+        }
+
+        private void FrmMain_KeyDown(object sender, KeyEventArgs e)
         {
             int maxVerticalOffset = ClientSize.Height - resizedBitmap.Height;
             int maxHorizontalOffset = ClientSize.Width - resizedBitmap.Width;
@@ -152,13 +168,21 @@ namespace comicReader.NET
                     ResizeImage();
                     SetDefaultPosition();
                     break;
+                case Keys.Insert:
+                    archiveReader.MoveToNextCollection();
+                    originalBitmap = new Bitmap(new System.IO.MemoryStream(archiveReader.GetCurrentFile()));
+                    ResizeImage();
+                    SetDefaultPosition();
+                    break;
+                case Keys.Delete:
+                    this.WindowState = FormWindowState.Minimized;
+                    return;
                 default:
                     return;
             }
 
             RepaintAll();
         }
-
 
         private void FrmMain_KeyPress(object sender, KeyPressEventArgs e)
         {
@@ -208,5 +232,6 @@ namespace comicReader.NET
             SetDefaultPosition();
             RepaintAll();
         }
+
     }
 }
