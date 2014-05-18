@@ -5,7 +5,7 @@ using System.Text;
 
 namespace comicReader.NET
 {
-    class Manga
+    class Comic
     {
         public string title { get; set; }
         public string path { get; set; }
@@ -16,7 +16,7 @@ namespace comicReader.NET
             get { return _creationTime; }
         }
 
-        public Manga()
+        public Comic()
         {
             _creationTime = DateTime.Now;
         }

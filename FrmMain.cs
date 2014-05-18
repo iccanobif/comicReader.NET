@@ -25,20 +25,23 @@ namespace comicReader.NET
         int currentVerticalPosition = 0;
         int currentHorizontalPosition = 0;
         ArchiveReader archiveReader;
-        Manga currentManga;
+        Comic currentComic = null;
+        Library currentLibrary = new Library();
 
         public FrmMain()
         {
             InitializeComponent();
 
-            currentManga = new Manga();
-            currentManga.path = @"f:\mieiProgrammi\comicReader.NET\testImages\arthur";
+            //currentManga = new Manga();
+            //currentManga.path = @"f:\mieiProgrammi\comicReader.NET\testImages\test.zip";
 
-            archiveReader = new ArchiveReader(currentManga.path);
-            originalBitmap = new Bitmap(new System.IO.MemoryStream(archiveReader.GetCurrentFile()));
-            this.BackColor = Color.Black;
-            ResizeImage();
-            SetDefaultPosition();
+            //archiveReader = new ArchiveReader(currentManga.path);
+
+            if (currentComic != null)
+            {
+                //originalBitmap = new Bitmap(new System.IO.MemoryStream(archiveReader.GetCurrentFile()));
+                //ResizeImage();
+            }
         }
 
         public void ResizeImage()
@@ -56,6 +59,8 @@ namespace comicReader.NET
             }
 
             SetWindowTitle(archiveReader.GetCurrentFileName());
+
+            SetDefaultPosition();
         }
 
         private void FrmMain_KeyUp(object sender, KeyEventArgs e)
@@ -70,6 +75,14 @@ namespace comicReader.NET
 
         private void FrmMain_KeyDown(object sender, KeyEventArgs e)
         {
+            if (e.KeyCode == Keys.L)
+            {
+                // Open library window
+                return;
+            }
+
+            if (currentComic == null) return; // The other keycodes are relevant only if a comic has been opened
+
             int maxVerticalOffset = ClientSize.Height - resizedBitmap.Height;
             int maxHorizontalOffset = ClientSize.Width - resizedBitmap.Width;
 
@@ -79,12 +92,10 @@ namespace comicReader.NET
                 case Keys.Add:
                     zoom = zoom * 1.1;
                     ResizeImage();
-                    SetDefaultPosition();
                     break;
                 case Keys.Subtract:
                     zoom = zoom * 0.9;
                     ResizeImage();
-                    SetDefaultPosition();
                     break;
                 //ARROW KEYS
                 case Keys.Down:
@@ -161,18 +172,15 @@ namespace comicReader.NET
                 case Keys.PageDown:
                     originalBitmap = new Bitmap(new System.IO.MemoryStream(archiveReader.GetNextFile()));
                     ResizeImage();
-                    SetDefaultPosition();
                     break;
                 case Keys.PageUp:
                     originalBitmap = new Bitmap(new System.IO.MemoryStream(archiveReader.GetPreviousFile()));
                     ResizeImage();
-                    SetDefaultPosition();
                     break;
                 case Keys.Insert:
                     archiveReader.MoveToNextCollection();
                     originalBitmap = new Bitmap(new System.IO.MemoryStream(archiveReader.GetCurrentFile()));
                     ResizeImage();
-                    SetDefaultPosition();
                     break;
                 case Keys.Delete:
                     this.WindowState = FormWindowState.Minimized;
@@ -211,7 +219,12 @@ namespace comicReader.NET
 
         private void PaintImage(Graphics g)
         {
+            if (currentComic == null) return;
+
+            //TODO
             if (currentDisplayMode != DisplayMode.Zoom) return;
+
+
 
             g.DrawImage(resizedBitmap, new Point(currentHorizontalPosition, currentVerticalPosition));
             g.FillRectangle(Brushes.Black, 0, 0, currentHorizontalPosition, this.ClientSize.Height);
