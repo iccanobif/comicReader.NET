@@ -25,5 +25,20 @@ namespace comicReader.NET
             return File.ReadAllBytes(fileNames[CurrentPosition]);
         }
 
+        public byte[] GetNextFile()
+        {
+            CurrentPosition++;
+            if (CurrentPosition >= fileNames.Length)
+                CurrentPosition = 0;
+            return GetCurrentFile();
+        }
+
+        public byte[] GetPreviousFile()
+        {
+            CurrentPosition--;
+            if (CurrentPosition < 0)
+                CurrentPosition = fileNames.Length - 1;
+            return GetCurrentFile();
+        }
     }
 }
