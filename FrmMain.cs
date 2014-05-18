@@ -42,6 +42,9 @@ namespace comicReader.NET
                 //originalBitmap = new Bitmap(new System.IO.MemoryStream(archiveReader.GetCurrentFile()));
                 //ResizeImage();
             }
+
+            FrmLibrary dialog = new FrmLibrary(currentLibrary);
+            dialog.ShowDialog();
         }
 
         public void ResizeImage()

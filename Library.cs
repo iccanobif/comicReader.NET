@@ -6,7 +6,7 @@ using System.Data.SQLite;
 
 namespace comicReader.NET
 {
-    class Library
+    public class Library
     {
         SQLiteConnection conn = new SQLiteConnection("Data Source=comicLibrary.db;Version=3");
 
