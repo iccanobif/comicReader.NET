@@ -24,7 +24,7 @@ namespace comicReader.NET
         double zoom = 1;
         int currentVerticalPosition = 0;
         int currentHorizontalPosition = 0;
-        ArchiveReader archiveReader;
+        ArchiveReader currentArchiveReader;
         Comic currentComic = null;
         Library currentLibrary = new Library();
 
@@ -32,25 +32,26 @@ namespace comicReader.NET
         {
             InitializeComponent();
 
-            //currentManga = new Manga();
-            //currentManga.path = @"f:\mieiProgrammi\comicReader.NET\testImages\test.zip";
+            //currentComic = new Comic();
+            //currentComic.path = @"f:\mieiProgrammi\comicReader.NET\testImages\arthur";
 
-            //archiveReader = new ArchiveReader(currentManga.path);
+            //archiveReader = new ArchiveReader(currentComic.path);
 
-            if (currentComic != null)
-            {
-                //originalBitmap = new Bitmap(new System.IO.MemoryStream(archiveReader.GetCurrentFile()));
-                //ResizeImage();
-            }
+
 
             FrmLibrary dialog = new FrmLibrary(currentLibrary);
-            dialog.ShowDialog();
+            currentArchiveReader = dialog.GetNewReader();
+
+            if (currentArchiveReader != null)
+            {
+                originalBitmap = new Bitmap(new System.IO.MemoryStream(currentArchiveReader.GetCurrentFile()));
+                ResizeImage();
+            }
         }
 
         public void ResizeImage()
         {
             resizedBitmap = new Bitmap((int)(originalBitmap.Width * zoom), (int)(originalBitmap.Height * zoom));
-            //resizedBitmap.SetResolution(originalBitmap.HorizontalResolution, originalBitmap.VerticalResolution);
 
             using (Graphics graphics = Graphics.FromImage(resizedBitmap))
             {
@@ -61,7 +62,7 @@ namespace comicReader.NET
                 graphics.DrawImage(originalBitmap, 0, 0, resizedBitmap.Width, resizedBitmap.Height);
             }
 
-            SetWindowTitle(archiveReader.GetCurrentFileName());
+            SetWindowTitle(currentArchiveReader.GetCurrentFileName());
 
             SetDefaultPosition();
         }
@@ -173,16 +174,16 @@ namespace comicReader.NET
                     break;
                 // PAGE KEYS
                 case Keys.PageDown:
-                    originalBitmap = new Bitmap(new System.IO.MemoryStream(archiveReader.GetNextFile()));
+                    originalBitmap = new Bitmap(new System.IO.MemoryStream(currentArchiveReader.GetNextFile()));
                     ResizeImage();
                     break;
                 case Keys.PageUp:
-                    originalBitmap = new Bitmap(new System.IO.MemoryStream(archiveReader.GetPreviousFile()));
+                    originalBitmap = new Bitmap(new System.IO.MemoryStream(currentArchiveReader.GetPreviousFile()));
                     ResizeImage();
                     break;
                 case Keys.Insert:
-                    archiveReader.MoveToNextCollection();
-                    originalBitmap = new Bitmap(new System.IO.MemoryStream(archiveReader.GetCurrentFile()));
+                    currentArchiveReader.MoveToNextCollection();
+                    originalBitmap = new Bitmap(new System.IO.MemoryStream(currentArchiveReader.GetCurrentFile()));
                     ResizeImage();
                     break;
                 case Keys.Delete:
@@ -227,15 +228,10 @@ namespace comicReader.NET
             //TODO
             if (currentDisplayMode != DisplayMode.Zoom) return;
 
-
-
             g.DrawImage(resizedBitmap, new Point(currentHorizontalPosition, currentVerticalPosition));
             g.FillRectangle(Brushes.Black, 0, 0, currentHorizontalPosition, this.ClientSize.Height);
             g.FillRectangle(Brushes.Black, currentHorizontalPosition + resizedBitmap.Width, 0, this.Width, this.ClientSize.Height);
             g.FillRectangle(Brushes.Black, currentHorizontalPosition, resizedBitmap.Height, resizedBitmap.Width + 1, this.ClientSize.Height);
-
-
-            //g.DrawImage(resizedBitmap, new Point(0, 0));
         }
 
         private void FrmMain_Paint(object sender, PaintEventArgs e)

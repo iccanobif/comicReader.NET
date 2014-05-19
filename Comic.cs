@@ -5,10 +5,11 @@ using System.Text;
 
 namespace comicReader.NET
 {
-    class Comic
+    public class Comic
     {
-        public string title { get; set; }
-        public string path { get; set; }
+        public string Title { get; set; }
+        public string Path { get; set; }
+        public long Id { get; set; }
 
         private DateTime _creationTime;
         public DateTime creationTime
