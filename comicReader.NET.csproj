@@ -69,6 +69,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArchiveReader.cs" />
+    <Compile Include="FrmFileSystemNavigation.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FrmFileSystemNavigation.Designer.cs">
+      <DependentUpon>FrmFileSystemNavigation.cs</DependentUpon>
+    </Compile>
     <Compile Include="FrmLibrary.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -85,6 +91,9 @@
     <Compile Include="Comic.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="FrmFileSystemNavigation.resx">
+      <DependentUpon>FrmFileSystemNavigation.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="FrmLibrary.resx">
       <DependentUpon>FrmLibrary.cs</DependentUpon>
     </EmbeddedResource>

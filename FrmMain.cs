@@ -39,14 +39,7 @@ namespace comicReader.NET
 
 
 
-            FrmLibrary dialog = new FrmLibrary(currentLibrary);
-            currentArchiveReader = dialog.GetNewReader();
 
-            if (currentArchiveReader != null)
-            {
-                originalBitmap = new Bitmap(new System.IO.MemoryStream(currentArchiveReader.GetCurrentFile()));
-                ResizeImage();
-            }
         }
 
         public void ResizeImage()
@@ -79,13 +72,23 @@ namespace comicReader.NET
 
         private void FrmMain_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.L)
+            switch (e.KeyCode)
             {
-                // Open library window
-                return;
+                case Keys.L:
+                    // Open library window
+                    break;
+                case Keys.N:
+                    FrmFileSystemNavigation dialog = new FrmFileSystemNavigation();
+                    currentArchiveReader = dialog.GetNewReader();
+
+                    if (currentArchiveReader == null) return;
+
+                    originalBitmap = new Bitmap(new System.IO.MemoryStream(currentArchiveReader.GetCurrentFile()));
+                    ResizeImage();
+                    break;
             }
 
-            if (currentComic == null) return; // The other keycodes are relevant only if a comic has been opened
+            if (currentArchiveReader == null) return; // The other keycodes are relevant only if a comic has been opened
 
             int maxVerticalOffset = ClientSize.Height - resizedBitmap.Height;
             int maxHorizontalOffset = ClientSize.Width - resizedBitmap.Width;
@@ -223,7 +226,7 @@ namespace comicReader.NET
 
         private void PaintImage(Graphics g)
         {
-            if (currentComic == null) return;
+            if (resizedBitmap == null) return;
 
             //TODO
             if (currentDisplayMode != DisplayMode.Zoom) return;

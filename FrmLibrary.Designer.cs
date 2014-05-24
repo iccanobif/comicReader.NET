@@ -45,7 +45,6 @@
             this.LstComics.Name = "LstComics";
             this.LstComics.Size = new System.Drawing.Size(614, 446);
             this.LstComics.TabIndex = 0;
-            this.LstComics.SelectedIndexChanged += new System.EventHandler(this.LstComics_SelectedIndexChanged);
             // 
             // TxtFilter
             // 

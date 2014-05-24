@@ -14,6 +14,7 @@ namespace comicReader.NET
     {
         string currentPath = string.Empty;
         ArchiveReader currentArchiveReader;
+        ArchiveReader outputArchiveReader = null;
 
         public FrmFileSystemNavigation()
         {
@@ -33,10 +34,10 @@ namespace comicReader.NET
         {
             ShowDialog();
 
-            if (currentArchiveReader.FileNames.Count == 0)
+            if (outputArchiveReader.FileNames.Count == 0)
                 return null;
 
-            return currentArchiveReader;
+            return outputArchiveReader;
         }
 
         private void LstFileSystem_DoubleClick(object sender, EventArgs e)
@@ -67,6 +68,13 @@ namespace comicReader.NET
 
             foreach (string fileName in currentArchiveReader.FileNames)
                 LstImages.Items.Add(fileName);
+        }
+
+        private void BtnOk_Click(object sender, EventArgs e)
+        {
+            currentArchiveReader.CurrentPosition = LstImages.SelectedIndex == -1 ? 0 : LstImages.SelectedIndex;
+            outputArchiveReader = currentArchiveReader;
+            Close();
         }
 
 
