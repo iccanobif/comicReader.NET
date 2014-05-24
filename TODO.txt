@@ -1,0 +1,29 @@
+﻿STRUTTURA GUI:
+- Popup Libreria 
+	- Alla chiusura restituisce un oggetto COmic
+	- Per l'add di nuovi comic potrebbe:
+		- usare il path dell'archive reader presente nella finestra principale (e se non ce n'e' uno?)
+		- aprire il popup navigazione per scegliere <- per ora questa dovrebbe andare bene
+		- Anzi posso fare un po' e un po': tengo una textbox che viene popolata automaticamente col path del reader della finestra,
+		  principale (se non ce n'e', lascio vuoto) e a fianco metto un pulsante che apre il popup di navigazione file system
+- Popup Navigazione file system
+	- Visualizza sia gli archivi che il loro contenuto
+	- Restituisce un ArchiveReader che punta gia' alla posizione scelta nella lista pagine del popup
+
+la classe Comic ha dentro un path e un numero di pagina e offre un metodo per generare un ARchive REAder che punti a quella pagina
+la pagina e path del Comic corrente non cambiano, vengono allineate all'archive reader corrente solo quando salvo
+
+processo di salvataggio:
+- setto il path e la pagina corrente dell'oggetto currentComic a quanto attualmente presente nel currentArchiveReader
+- chiamo un metodo SaveComic(Comic c) della library che, andando per Comic.Id, fa un'UPDATE del nuovo path, numero pagina e varie ed eventuali (livello di zoom, tipologia di visualizzazione...)
+
+La form principale si ritrova cosi' a supportare due modalita'
+- sia currentComic che currentArchiveReader NON NULL
+- currentArchiveReader NON NULL e currentComic NULL -> quando faccio CTRL+S, viene aperto il popup di Libreria per inserire un nuovo Comic (?)
+
+Oppure fare in modo che ci sia SEMPRE un comic corrente? All'avvio apro automaticamente la libreria e costringo a selezionare un comic (?)
+
+
+TODO:
+- Splittare l'attuale popup di libreria in due popup: uno con solo l'elenco dei comic salvati e uno per navigare nel file system.
+

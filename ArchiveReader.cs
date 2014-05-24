@@ -50,6 +50,7 @@ namespace comicReader.NET
             {
                 FileNames = Directory.GetFiles(path).ToList<string>();
                 SiblingCollections = Directory.GetDirectories(path).ToList<string>();
+                SiblingCollections.AddRange(Directory.GetFiles(path, "*.zip"));
             }
 
             FileNames = (from names in FileNames
