@@ -56,7 +56,11 @@ namespace comicReader.NET
 
             Debug.Print("Resizing time: " + DateTime.Now.Subtract(start).ToString());
 
-            SetWindowTitle(string.Format("{0} - {1}", System.IO.Path.GetFileName(currentArchiveReader.CurrentPath), currentArchiveReader.GetCurrentFileName()));
+            SetWindowTitle(string.Format("{0} - {1}{2}", 
+                                         System.IO.Path.GetFileName(currentArchiveReader.CurrentPath), 
+                                         currentArchiveReader.GetCurrentFileName(),
+                                         currentArchiveReader.CurrentPosition == currentArchiveReader.FileNames.Count - 1 ? " [END]" : string.Empty
+                                         ));
 
             SetDefaultPosition();
         }
@@ -84,8 +88,12 @@ namespace comicReader.NET
                     RepaintAll();
                     return;
                 case Keys.N:
-                    FrmFileSystemNavigation dialog = new FrmFileSystemNavigation();
-                    currentArchiveReader = dialog.GetNewReader();
+                    FrmFileSystemNavigation dialog = new FrmFileSystemNavigation(currentArchiveReader == null 
+                                                                                    ? string.Empty
+                                                                                    : currentArchiveReader.CurrentPath);
+                    ArchiveReader newArchiveReader = dialog.GetNewReader();
+
+                    currentArchiveReader = newArchiveReader == null ? currentArchiveReader : newArchiveReader;
 
                     if (currentArchiveReader == null) return;
 
@@ -258,6 +266,5 @@ namespace comicReader.NET
             SetDefaultPosition();
             RepaintAll();
         }
-
     }
 }

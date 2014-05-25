@@ -16,18 +16,18 @@ namespace comicReader.NET
         ArchiveReader currentArchiveReader;
         ArchiveReader outputArchiveReader = null;
 
-        public FrmFileSystemNavigation()
+        public FrmFileSystemNavigation(string path)
         {
             InitializeComponent();
+
+            currentPath = path;
+
+            UpdateLists();
         }
 
-        private void FrmFileSystemNavigation_Load(object sender, EventArgs e)
+        public FrmFileSystemNavigation()
+            : this(string.Empty)
         {
-            //TODO: Bisogna mettere in una classe a parte le logiche per il sorting dei file e per la navigazione
-            // servono sia qui che in ArchiveReader per il next chapter, a meno che non vada a spostare quella logica
-            // dall'Archive alla Library (fondamentalmente, quando cambio capitolo, creo un nuovo ArchiveReader)
-
-            LstFileSystem.Items.AddRange(Directory.GetLogicalDrives());
         }
 
         public ArchiveReader GetNewReader()
@@ -40,15 +40,11 @@ namespace comicReader.NET
             return outputArchiveReader;
         }
 
-        private void LstFileSystem_DoubleClick(object sender, EventArgs e)
+        private void UpdateLists()
         {
-            if (string.IsNullOrEmpty(currentPath))
-                currentPath = LstFileSystem.SelectedItem.ToString();
-            else
-                if (LstFileSystem.SelectedItem.ToString() == "..")
-                    currentPath = Path.GetDirectoryName(currentPath);
-                else
-                    currentPath = Path.Combine(currentPath, LstFileSystem.SelectedItem.ToString());
+            //TODO: Bisogna mettere in una classe a parte le logiche per il sorting dei file e per la navigazione
+            // servono sia qui che in ArchiveReader per il next chapter, a meno che non vada a spostare quella logica
+            // dall'Archive alla Library (fondamentalmente, quando cambio capitolo, creo un nuovo ArchiveReader)
 
             LstFileSystem.Items.Clear();
             LstImages.Items.Clear();
@@ -68,6 +64,19 @@ namespace comicReader.NET
 
             foreach (string fileName in currentArchiveReader.FileNames)
                 LstImages.Items.Add(fileName);
+        }
+
+        private void LstFileSystem_DoubleClick(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(currentPath))
+                currentPath = LstFileSystem.SelectedItem.ToString();
+            else
+                if (LstFileSystem.SelectedItem.ToString() == "..")
+                    currentPath = Path.GetDirectoryName(currentPath);
+                else
+                    currentPath = Path.Combine(currentPath, LstFileSystem.SelectedItem.ToString());
+
+            UpdateLists();
         }
 
         private void BtnOk_Click(object sender, EventArgs e)

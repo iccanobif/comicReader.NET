@@ -77,7 +77,6 @@
             this.Controls.Add(this.LstFileSystem);
             this.Name = "FrmFileSystemNavigation";
             this.Text = "FrmFileSystemNavigation";
-            this.Load += new System.EventHandler(this.FrmFileSystemNavigation_Load);
             this.ResumeLayout(false);
 
         }

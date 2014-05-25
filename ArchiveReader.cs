@@ -59,13 +59,18 @@ namespace comicReader.NET
             }
 
             FileNames = (from names in FileNames
-                         where allowedExtensions.IsMatch(names.ToString())
+                         where allowedExtensions.IsMatch(names)
+                               && !names.StartsWith("__MACOSX")
                          orderby names
                          select names).ToList<string>();
 
             FileNames.Sort(new NaturalComparer());
 
-            // Load parent names
+            PopulateParentCollections();
+        }
+
+        private void PopulateParentCollections()
+        {
             if (isArchive)
                 ParentCollections = Directory.GetFiles(Path.GetDirectoryName(currentPath), "*.zip").ToList<string>();
             else
@@ -89,13 +94,13 @@ namespace comicReader.NET
 
             if (!isArchive)
                 output = File.ReadAllBytes(FileNames[CurrentPosition]);
-
-            using (SevenZipExtractor ex = new SevenZipExtractor(currentPath))
-            {
-                MemoryStream str = new MemoryStream();
-                ex.ExtractFile(FileNames[CurrentPosition], str);
-                output = str.ToArray();
-            }
+            else
+                using (SevenZipExtractor ex = new SevenZipExtractor(currentPath))
+                {
+                    MemoryStream str = new MemoryStream();
+                    ex.ExtractFile(FileNames[CurrentPosition], str);
+                    output = str.ToArray();
+                }
 
             Debug.Print("File extraction time: " + DateTime.Now.Subtract(start).ToString());
             return output;
@@ -119,6 +124,8 @@ namespace comicReader.NET
 
         public void MoveToNextCollection()
         {
+            PopulateParentCollections();
+
             for (int i = 0; i < ParentCollections.Count; i++)
                 if (ParentCollections[i] == currentPath)
                 {
