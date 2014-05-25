@@ -53,7 +53,9 @@ namespace comicReader.NET
             }
             else
             {
-                FileNames = Directory.GetFiles(currentPath).ToList<string>();
+                FileNames = (from p in Directory.GetFiles(currentPath)
+                             select Path.GetFileName(p)).ToList<string>();
+
                 SiblingCollections = Directory.GetDirectories(currentPath).ToList<string>();
                 SiblingCollections.AddRange(Directory.GetFiles(currentPath, "*.zip"));
             }
@@ -93,7 +95,7 @@ namespace comicReader.NET
             byte[] output;
 
             if (!isArchive)
-                output = File.ReadAllBytes(FileNames[CurrentPosition]);
+                output = File.ReadAllBytes(Path.Combine(currentPath, FileNames[CurrentPosition]));
             else
                 using (SevenZipExtractor ex = new SevenZipExtractor(currentPath))
                 {
@@ -133,7 +135,7 @@ namespace comicReader.NET
                         currentPath = ParentCollections[0];
                     else
                         currentPath = ParentCollections[i + 1];
-                    
+
                     break;
                 }
 

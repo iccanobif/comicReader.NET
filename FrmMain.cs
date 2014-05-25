@@ -28,6 +28,7 @@ namespace comicReader.NET
         ArchiveReader currentArchiveReader;
         Comic currentComic = null;
         Library currentLibrary = new Library();
+        string osdText = string.Empty;
 
         public FrmMain()
         {
@@ -62,12 +63,9 @@ namespace comicReader.NET
                                          currentArchiveReader.CurrentPosition == currentArchiveReader.FileNames.Count - 1 ? " [END]" : string.Empty
                                          ));
 
+            osdText = currentArchiveReader.CurrentPosition == currentArchiveReader.FileNames.Count - 1 ? "END" : string.Empty;
+
             SetDefaultPosition();
-        }
-
-        private void FrmMain_KeyUp(object sender, KeyEventArgs e)
-        {
-
         }
 
         private void SetWindowTitle(string title)
@@ -214,17 +212,12 @@ namespace comicReader.NET
             RepaintAll();
         }
 
-        private void FrmMain_KeyPress(object sender, KeyPressEventArgs e)
-        {
-
-        }
-
         private void FrmMain_MouseWheel(object sender, MouseEventArgs e)
         {
             if (e.Delta < 0)
-                FrmMain_KeyUp(null, new KeyEventArgs(Keys.Down));
+                FrmMain_KeyDown(null, new KeyEventArgs(Keys.Down));
             else
-                FrmMain_KeyUp(null, new KeyEventArgs(Keys.Up));
+                FrmMain_KeyDown(null, new KeyEventArgs(Keys.Up));
         }
 
         private void RepaintAll()
@@ -252,6 +245,11 @@ namespace comicReader.NET
             g.FillRectangle(Brushes.Black, 0, 0, currentHorizontalPosition, this.ClientSize.Height);
             g.FillRectangle(Brushes.Black, currentHorizontalPosition + resizedBitmap.Width, 0, this.Width, this.ClientSize.Height);
             g.FillRectangle(Brushes.Black, currentHorizontalPosition, resizedBitmap.Height, resizedBitmap.Width + 1, this.ClientSize.Height);
+
+            if (!string.IsNullOrEmpty(osdText))
+            {
+                g.DrawString(osdText, new Font(FontFamily.GenericMonospace, 20, FontStyle.Bold), Brushes.Red, 30, 30);
+            }
 
             Debug.Print("Painting time: " + DateTime.Now.Subtract(start).ToString());
         }

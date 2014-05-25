@@ -23,7 +23,6 @@ La form principale si ritrova cosi' a supportare due modalita'
 
 Oppure fare in modo che ci sia SEMPRE un comic corrente? All'avvio apro automaticamente la libreria e costringo a selezionare un comic (?)
 
-
 TODO:
 - Splittare l'attuale popup di libreria in due popup: uno con solo l'elenco dei comic salvati e uno per navigare nel file system.
 - Mettere in piedi un sistema per disegnare messaggi sullo schermo
