@@ -13,26 +13,30 @@ namespace comicReader.NET
     public partial class FrmFileSystemNavigation : Form
     {
         string currentPath = string.Empty;
+        int startPosition = -1;
         ArchiveReader currentArchiveReader;
         ArchiveReader outputArchiveReader = null;
 
-        public FrmFileSystemNavigation(string path)
+        public FrmFileSystemNavigation(string path, int position)
         {
             InitializeComponent();
 
             currentPath = path;
+            startPosition = position;
 
             UpdateLists();
+
+            LstImages.SelectedIndex = startPosition;
         }
 
         public FrmFileSystemNavigation()
-            : this(string.Empty)
+            : this(string.Empty, -1)
         {
         }
 
         public ArchiveReader GetNewReader()
         {
-            ShowDialog();
+            base.ShowDialog();
 
             if (outputArchiveReader == null || outputArchiveReader.FileNames.Count == 0)
                 return null;
@@ -85,7 +89,6 @@ namespace comicReader.NET
             outputArchiveReader = currentArchiveReader;
             Close();
         }
-
 
     }
 }

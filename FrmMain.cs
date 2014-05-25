@@ -83,13 +83,25 @@ namespace comicReader.NET
                     return;
                 case Keys.L:
                     // Open library window
+                    FrmLibrary libraryDialog = new FrmLibrary(currentLibrary);
+                    Comic newComic = libraryDialog.GetComic();
+
+                    if (newComic == null) return;
+                    
+                    currentComic = newComic;
+                    currentArchiveReader = currentComic.CreateArchiveReader();
+                    originalBitmap = new Bitmap(new System.IO.MemoryStream(currentArchiveReader.GetCurrentFile()));
+                    ResizeImage();
                     RepaintAll();
                     return;
                 case Keys.N:
-                    FrmFileSystemNavigation dialog = new FrmFileSystemNavigation(currentArchiveReader == null 
-                                                                                    ? string.Empty
-                                                                                    : currentArchiveReader.CurrentPath);
-                    ArchiveReader newArchiveReader = dialog.GetNewReader();
+                    FrmFileSystemNavigation navigatorDialog;
+                    if (currentArchiveReader == null)
+                        navigatorDialog = new FrmFileSystemNavigation();
+                    else
+                        navigatorDialog = new FrmFileSystemNavigation(currentArchiveReader.CurrentPath, currentArchiveReader.CurrentPosition);
+
+                    ArchiveReader newArchiveReader = navigatorDialog.GetNewReader();
 
                     currentArchiveReader = newArchiveReader == null ? currentArchiveReader : newArchiveReader;
 

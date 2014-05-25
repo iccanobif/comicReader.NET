@@ -21,6 +21,12 @@ namespace comicReader.NET
             InitializeComponent();
         }
 
+        public Comic GetComic()
+        {
+            this.ShowDialog();
+            return null;
+        }
+
         private void FrmLibrary_Load(object sender, EventArgs e)
         {
 

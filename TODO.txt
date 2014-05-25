@@ -6,9 +6,9 @@
 		- aprire il popup navigazione per scegliere <- per ora questa dovrebbe andare bene
 		- Anzi posso fare un po' e un po': tengo una textbox che viene popolata automaticamente col path del reader della finestra,
 		  principale (se non ce n'e', lascio vuoto) e a fianco metto un pulsante che apre il popup di navigazione file system
-- Popup Navigazione file system
-	- Visualizza sia gli archivi che il loro contenuto
-	- Restituisce un ArchiveReader che punta gia' alla posizione scelta nella lista pagine del popup
+- Popup Navigazione file system -> OK
+	- Visualizza sia gli archivi che il loro contenuto -> OK
+	- Restituisce un ArchiveReader che punta gia' alla posizione scelta nella lista pagine del popup -> OK
 
 la classe Comic ha dentro un path e un numero di pagina e offre un metodo per generare un Archive Reader che punti a quella pagina
 la pagina e path del Comic corrente non cambiano, vengono allineate all'archive reader corrente solo quando salvo
