@@ -73,15 +73,35 @@ namespace comicReader.NET
 
         private void FrmMain_KeyDown(object sender, KeyEventArgs e)
         {
-            int maxVerticalOffset = 0;
-            int maxHorizontalOffset = 0;
-
-            if (resizedBitmap != null)
+            //Commands that make sense even when there's no open comic at the moment
+            switch (e.KeyCode)
             {
-                maxVerticalOffset = ClientSize.Height - resizedBitmap.Height;
-                maxHorizontalOffset = ClientSize.Width - resizedBitmap.Width;
+                case Keys.Delete:
+                    this.WindowState = FormWindowState.Minimized;
+                    return;
+                case Keys.L:
+                    // Open library window
+                    RepaintAll();
+                    return;
+                case Keys.N:
+                    FrmFileSystemNavigation dialog = new FrmFileSystemNavigation();
+                    currentArchiveReader = dialog.GetNewReader();
+
+                    if (currentArchiveReader == null) return;
+
+                    originalBitmap = new Bitmap(new System.IO.MemoryStream(currentArchiveReader.GetCurrentFile()));
+                    ResizeImage();
+                    RepaintAll();
+                    return;
             }
 
+            if (currentArchiveReader == null)
+                return;
+
+            int maxVerticalOffset = ClientSize.Height - resizedBitmap.Height;
+            int maxHorizontalOffset = ClientSize.Width - resizedBitmap.Width;
+
+            //Commands that are only relevant when there's an open comic
             switch (e.KeyCode)
             {
                 // ZOOM KEYS
@@ -178,21 +198,7 @@ namespace comicReader.NET
                     originalBitmap = new Bitmap(new System.IO.MemoryStream(currentArchiveReader.GetCurrentFile()));
                     ResizeImage();
                     break;
-                case Keys.Delete:
-                    this.WindowState = FormWindowState.Minimized;
-                    return;
-                case Keys.L:
-                    // Open library window
-                    break;
-                case Keys.N:
-                    FrmFileSystemNavigation dialog = new FrmFileSystemNavigation();
-                    currentArchiveReader = dialog.GetNewReader();
 
-                    if (currentArchiveReader == null) return;
-
-                    originalBitmap = new Bitmap(new System.IO.MemoryStream(currentArchiveReader.GetCurrentFile()));
-                    ResizeImage();
-                    break;
                 default:
                     return;
             }

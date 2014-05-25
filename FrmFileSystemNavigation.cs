@@ -34,7 +34,7 @@ namespace comicReader.NET
         {
             ShowDialog();
 
-            if (outputArchiveReader.FileNames.Count == 0)
+            if (outputArchiveReader == null || outputArchiveReader.FileNames.Count == 0)
                 return null;
 
             return outputArchiveReader;
