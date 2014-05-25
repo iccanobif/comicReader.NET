@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using System.Diagnostics;
 
 namespace comicReader.NET
 {
@@ -36,14 +37,12 @@ namespace comicReader.NET
             //currentComic.path = @"f:\mieiProgrammi\comicReader.NET\testImages\arthur";
 
             //archiveReader = new ArchiveReader(currentComic.path);
-
-
-
-
         }
 
         public void ResizeImage()
         {
+            DateTime start = DateTime.Now;
+
             resizedBitmap = new Bitmap((int)(originalBitmap.Width * zoom), (int)(originalBitmap.Height * zoom));
 
             using (Graphics graphics = Graphics.FromImage(resizedBitmap))
@@ -55,7 +54,9 @@ namespace comicReader.NET
                 graphics.DrawImage(originalBitmap, 0, 0, resizedBitmap.Width, resizedBitmap.Height);
             }
 
-            SetWindowTitle(currentArchiveReader.GetCurrentFileName());
+            Debug.Print("Resizing time: " + DateTime.Now.Subtract(start).ToString());
+
+            SetWindowTitle(string.Format("{0} - {1}", System.IO.Path.GetFileName(currentArchiveReader.CurrentPath), currentArchiveReader.GetCurrentFileName()));
 
             SetDefaultPosition();
         }
@@ -72,26 +73,14 @@ namespace comicReader.NET
 
         private void FrmMain_KeyDown(object sender, KeyEventArgs e)
         {
-            switch (e.KeyCode)
+            int maxVerticalOffset = 0;
+            int maxHorizontalOffset = 0;
+
+            if (resizedBitmap != null)
             {
-                case Keys.L:
-                    // Open library window
-                    break;
-                case Keys.N:
-                    FrmFileSystemNavigation dialog = new FrmFileSystemNavigation();
-                    currentArchiveReader = dialog.GetNewReader();
-
-                    if (currentArchiveReader == null) return;
-
-                    originalBitmap = new Bitmap(new System.IO.MemoryStream(currentArchiveReader.GetCurrentFile()));
-                    ResizeImage();
-                    break;
+                maxVerticalOffset = ClientSize.Height - resizedBitmap.Height;
+                maxHorizontalOffset = ClientSize.Width - resizedBitmap.Width;
             }
-
-            if (currentArchiveReader == null) return; // The other keycodes are relevant only if a comic has been opened
-
-            int maxVerticalOffset = ClientSize.Height - resizedBitmap.Height;
-            int maxHorizontalOffset = ClientSize.Width - resizedBitmap.Width;
 
             switch (e.KeyCode)
             {
@@ -192,6 +181,18 @@ namespace comicReader.NET
                 case Keys.Delete:
                     this.WindowState = FormWindowState.Minimized;
                     return;
+                case Keys.L:
+                    // Open library window
+                    break;
+                case Keys.N:
+                    FrmFileSystemNavigation dialog = new FrmFileSystemNavigation();
+                    currentArchiveReader = dialog.GetNewReader();
+
+                    if (currentArchiveReader == null) return;
+
+                    originalBitmap = new Bitmap(new System.IO.MemoryStream(currentArchiveReader.GetCurrentFile()));
+                    ResizeImage();
+                    break;
                 default:
                     return;
             }
@@ -228,6 +229,8 @@ namespace comicReader.NET
         {
             if (resizedBitmap == null) return;
 
+            DateTime start = DateTime.Now;
+
             //TODO
             if (currentDisplayMode != DisplayMode.Zoom) return;
 
@@ -235,6 +238,8 @@ namespace comicReader.NET
             g.FillRectangle(Brushes.Black, 0, 0, currentHorizontalPosition, this.ClientSize.Height);
             g.FillRectangle(Brushes.Black, currentHorizontalPosition + resizedBitmap.Width, 0, this.Width, this.ClientSize.Height);
             g.FillRectangle(Brushes.Black, currentHorizontalPosition, resizedBitmap.Height, resizedBitmap.Width + 1, this.ClientSize.Height);
+
+            Debug.Print("Painting time: " + DateTime.Now.Subtract(start).ToString());
         }
 
         private void FrmMain_Paint(object sender, PaintEventArgs e)

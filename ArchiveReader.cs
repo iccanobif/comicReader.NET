@@ -5,6 +5,7 @@ using System.Text;
 using System.IO;
 using SevenZip;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
 //using SevenZip.Sdk;
 
 namespace comicReader.NET
@@ -21,7 +22,11 @@ namespace comicReader.NET
     {
         static Regex allowedExtensions = new Regex(@"\.(jpg|jpeg|png)$", RegexOptions.IgnoreCase);
 
-        string path;
+        string currentPath;
+        public string CurrentPath
+        {
+            get { return currentPath; }
+        }
         public List<string> FileNames;
         public List<string> ParentCollections;
         public List<string> SiblingCollections;
@@ -30,7 +35,7 @@ namespace comicReader.NET
 
         public ArchiveReader(string path)
         {
-            this.path = path;
+            this.currentPath = path;
             LoadFileList();
         }
 
@@ -38,19 +43,19 @@ namespace comicReader.NET
         {
             CurrentPosition = 0;
 
-            isArchive = !System.IO.File.GetAttributes(path).HasFlag(FileAttributes.Directory);
+            isArchive = !System.IO.File.GetAttributes(currentPath).HasFlag(FileAttributes.Directory);
 
             if (isArchive)
             {
-                using (SevenZipExtractor ex = new SevenZipExtractor(path))
+                using (SevenZipExtractor ex = new SevenZipExtractor(currentPath))
                     FileNames = ex.ArchiveFileNames.ToList<string>();
                 SiblingCollections = new List<string>();
             }
             else
             {
-                FileNames = Directory.GetFiles(path).ToList<string>();
-                SiblingCollections = Directory.GetDirectories(path).ToList<string>();
-                SiblingCollections.AddRange(Directory.GetFiles(path, "*.zip"));
+                FileNames = Directory.GetFiles(currentPath).ToList<string>();
+                SiblingCollections = Directory.GetDirectories(currentPath).ToList<string>();
+                SiblingCollections.AddRange(Directory.GetFiles(currentPath, "*.zip"));
             }
 
             FileNames = (from names in FileNames
@@ -62,12 +67,12 @@ namespace comicReader.NET
 
             // Load parent names
             if (isArchive)
-                ParentCollections = Directory.GetFiles(Path.GetDirectoryName(path), "*.zip").ToList<string>();
+                ParentCollections = Directory.GetFiles(Path.GetDirectoryName(currentPath), "*.zip").ToList<string>();
             else
-                if (Directory.GetDirectoryRoot(path) == path)
+                if (Directory.GetDirectoryRoot(currentPath) == currentPath)
                     ParentCollections = new List<string>();
                 else
-                    ParentCollections = Directory.GetDirectories(Path.GetDirectoryName(path)).ToList<string>();
+                    ParentCollections = Directory.GetDirectories(Path.GetDirectoryName(currentPath)).ToList<string>();
 
             ParentCollections.Sort(new NaturalComparer());
         }
@@ -79,15 +84,21 @@ namespace comicReader.NET
 
         public byte[] GetCurrentFile()
         {
-            if (!isArchive)
-                return File.ReadAllBytes(FileNames[CurrentPosition]);
+            DateTime start = DateTime.Now;
+            byte[] output;
 
-            using (SevenZipExtractor ex = new SevenZipExtractor(path))
+            if (!isArchive)
+                output = File.ReadAllBytes(FileNames[CurrentPosition]);
+
+            using (SevenZipExtractor ex = new SevenZipExtractor(currentPath))
             {
                 MemoryStream str = new MemoryStream();
                 ex.ExtractFile(FileNames[CurrentPosition], str);
-                return str.ToArray();
+                output = str.ToArray();
             }
+
+            Debug.Print("File extraction time: " + DateTime.Now.Subtract(start).ToString());
+            return output;
         }
 
         public byte[] GetNextFile()
@@ -109,12 +120,12 @@ namespace comicReader.NET
         public void MoveToNextCollection()
         {
             for (int i = 0; i < ParentCollections.Count; i++)
-                if (ParentCollections[i] == path)
+                if (ParentCollections[i] == currentPath)
                 {
                     if (i >= ParentCollections.Count - 1)
-                        path = ParentCollections[0];
+                        currentPath = ParentCollections[0];
                     else
-                        path = ParentCollections[i + 1];
+                        currentPath = ParentCollections[i + 1];
                     
                     break;
                 }
