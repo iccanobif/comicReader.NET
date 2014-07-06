@@ -37,6 +37,7 @@
             this.label2 = new System.Windows.Forms.Label();
             this.TxtPath = new System.Windows.Forms.TextBox();
             this.BtnBrowse = new System.Windows.Forms.Button();
+            this.BtnDelete = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // LstComics
@@ -49,7 +50,6 @@
             this.LstComics.Name = "LstComics";
             this.LstComics.Size = new System.Drawing.Size(673, 407);
             this.LstComics.TabIndex = 1;
-            this.LstComics.SelectedIndexChanged += new System.EventHandler(this.LstComics_SelectedIndexChanged);
             this.LstComics.DoubleClick += new System.EventHandler(this.LstComics_DoubleClick);
             this.LstComics.KeyUp += new System.Windows.Forms.KeyEventHandler(this.LstComics_KeyUp);
             // 
@@ -67,7 +67,7 @@
             // BtnAddComic
             // 
             this.BtnAddComic.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.BtnAddComic.Location = new System.Drawing.Point(626, 491);
+            this.BtnAddComic.Location = new System.Drawing.Point(557, 492);
             this.BtnAddComic.Name = "BtnAddComic";
             this.BtnAddComic.Size = new System.Drawing.Size(59, 21);
             this.BtnAddComic.TabIndex = 5;
@@ -81,7 +81,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.TxtComicName.Location = new System.Drawing.Point(88, 492);
             this.TxtComicName.Name = "TxtComicName";
-            this.TxtComicName.Size = new System.Drawing.Size(532, 20);
+            this.TxtComicName.Size = new System.Drawing.Size(462, 20);
             this.TxtComicName.TabIndex = 4;
             // 
             // BtnOk
@@ -122,24 +122,35 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.TxtPath.Location = new System.Drawing.Point(88, 462);
             this.TxtPath.Name = "TxtPath";
-            this.TxtPath.Size = new System.Drawing.Size(532, 20);
+            this.TxtPath.Size = new System.Drawing.Size(462, 20);
             this.TxtPath.TabIndex = 2;
             // 
             // BtnBrowse
             // 
             this.BtnBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.BtnBrowse.Location = new System.Drawing.Point(626, 461);
+            this.BtnBrowse.Location = new System.Drawing.Point(556, 462);
             this.BtnBrowse.Name = "BtnBrowse";
             this.BtnBrowse.Size = new System.Drawing.Size(60, 24);
             this.BtnBrowse.TabIndex = 3;
             this.BtnBrowse.Text = "Browse";
             this.BtnBrowse.UseVisualStyleBackColor = true;
             // 
+            // BtnDelete
+            // 
+            this.BtnDelete.Location = new System.Drawing.Point(623, 463);
+            this.BtnDelete.Name = "BtnDelete";
+            this.BtnDelete.Size = new System.Drawing.Size(61, 48);
+            this.BtnDelete.TabIndex = 9;
+            this.BtnDelete.Text = "Delete";
+            this.BtnDelete.UseVisualStyleBackColor = true;
+            this.BtnDelete.Click += new System.EventHandler(this.BtnDelete_Click);
+            // 
             // FrmLibrary
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(697, 560);
+            this.Controls.Add(this.BtnDelete);
             this.Controls.Add(this.BtnBrowse);
             this.Controls.Add(this.TxtPath);
             this.Controls.Add(this.label2);
@@ -168,6 +179,7 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.TextBox TxtPath;
         private System.Windows.Forms.Button BtnBrowse;
+        private System.Windows.Forms.Button BtnDelete;
 
     }
 }

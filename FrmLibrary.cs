@@ -19,8 +19,14 @@ namespace comicReader.NET
 
         public FrmLibrary(Library l)
         {
-            library = l;
             InitializeComponent();
+            library = l;
+
+            LstComics.ValueMember = "Id";
+            LstComics.DisplayMember = "Title";
+            PopulateComicList();
+
+            TxtFilter.Focus();
         }
 
         public Comic GetComic()
@@ -31,11 +37,7 @@ namespace comicReader.NET
 
         private void FrmLibrary_Load(object sender, EventArgs e)
         {
-            LstComics.ValueMember = "Id";
-            LstComics.DisplayMember = "Title";
-            PopulateComicList();
-
-            TxtFilter.Focus();
+           
         }
 
         private void PopulateComicList()
@@ -89,7 +91,7 @@ namespace comicReader.NET
             ConfirmSelection();
         }
 
-        private void TxtFilter_TextChanged(object sender, EventArgs e)
+        private void ApplyFilter()
         {
             LstComics.DataSource = (from c in comicList
                                     where c.Title.ToUpper().Contains(TxtFilter.Text.ToUpper())
@@ -97,6 +99,11 @@ namespace comicReader.NET
 
             if (LstComics.Items.Count > 0)
                 LstComics.SelectedIndex = 0;
+        }
+
+        private void TxtFilter_TextChanged(object sender, EventArgs e)
+        {
+            ApplyFilter();
         }
 
         private void TxtFilter_KeyDown(object sender, KeyEventArgs e)
@@ -107,7 +114,9 @@ namespace comicReader.NET
                     LstComics.SelectedIndex = 1;
                     LstComics.Focus();
                     break;
-
+                case Keys.PageDown:
+                    LstComics.Focus();
+                    break;
                 case Keys.Enter:
                     ConfirmSelection();
                     break;
@@ -123,10 +132,16 @@ namespace comicReader.NET
                     break;
             }
         }
-
-        private void LstComics_SelectedIndexChanged(object sender, EventArgs e)
+        
+        private void BtnDelete_Click(object sender, EventArgs e)
         {
+            int previousSelectedIndex = LstComics.SelectedIndex;
+            library.DeleteComic(LstComics.SelectedValue.ToString());
+            PopulateComicList();
+            ApplyFilter();
 
+            if (LstComics.Items.Count > 0)
+                LstComics.SelectedIndex = LstComics.Items.Count - 1 > previousSelectedIndex ? previousSelectedIndex : LstComics.Items.Count - 1;
         }
     }
 }

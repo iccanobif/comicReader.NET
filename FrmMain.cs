@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Diagnostics;
+using System.IO;
 
 namespace comicReader.NET
 {
@@ -61,7 +62,8 @@ namespace comicReader.NET
             Debug.Print("Resizing time: " + DateTime.Now.Subtract(start).ToString());
 
             SetWindowTitle(string.Format("{0} - {1}{2}", 
-                                         currentComic != null ? currentComic.Title : System.IO.Path.GetFileName(currentArchiveReader.CurrentPath), 
+                                         //currentComic != null ? currentComic.Title : System.IO.Path.GetFileName(currentArchiveReader.CurrentPath), 
+                                         System.IO.Path.GetFileName(currentArchiveReader.CurrentPath), 
                                          currentArchiveReader.GetCurrentFileName(),
                                          currentArchiveReader.CurrentPosition == currentArchiveReader.FileNames.Count - 1 ? " [END]" : string.Empty
                                          ));
@@ -92,10 +94,19 @@ namespace comicReader.NET
                     if (newComic == null) return;
                     
                     currentComic = newComic;
-                    currentArchiveReader = currentComic.CreateArchiveReader();
-                    originalBitmap = new Bitmap(new System.IO.MemoryStream(currentArchiveReader.GetCurrentFile()));
-                    ResizeImage();
-                    RepaintAll();
+                    try
+                    {
+                        currentArchiveReader = currentComic.CreateArchiveReader();
+                        originalBitmap = new Bitmap(new System.IO.MemoryStream(currentArchiveReader.GetCurrentFile()));
+                        ResizeImage();
+                        RepaintAll();
+                    }
+                    catch (FileNotFoundException)
+                    {
+                        currentArchiveReader = null;
+                        SetWindowTitle(currentComic.Title);
+                        MessageBox.Show("Path does not exists!");
+                    }
                     return;
                 case Keys.N:
                     FrmFileSystemNavigation navigatorDialog;
@@ -215,7 +226,11 @@ namespace comicReader.NET
                     ResizeImage();
                     break;
                 case Keys.Insert:
-                    currentArchiveReader.MoveToNextCollection();
+                    if (e.Shift)
+                        currentArchiveReader.MoveToNextCollection(ArchiveReader.CollectionMovementDirection.Backwards);
+                    else
+                        currentArchiveReader.MoveToNextCollection(ArchiveReader.CollectionMovementDirection.Forward);
+
                     originalBitmap = new Bitmap(new System.IO.MemoryStream(currentArchiveReader.GetCurrentFile()));
                     ResizeImage();
                     break;
@@ -229,7 +244,16 @@ namespace comicReader.NET
                 case Keys.C:
                     if (currentComic == null) return;
 
-                    currentComic = currentLibrary.GetComic(currentComic.Id);
+                    try
+                    {
+                        currentComic = currentLibrary.GetComic(currentComic.Id);
+                    }
+                    catch (Library.NotExistingComicException)
+                    {
+                        MessageBox.Show("This comic doesn't seem to exist in the database. Maybe you already deleted it?");
+                        return;
+                    }
+
                     currentArchiveReader = currentComic.CreateArchiveReader();
                     originalBitmap = new Bitmap(new System.IO.MemoryStream(currentArchiveReader.GetCurrentFile()));
                     ResizeImage();
@@ -296,12 +320,16 @@ namespace comicReader.NET
 
         private void FrmMain_Resize(object sender, EventArgs e)
         {
+            if (currentArchiveReader == null) return;
+
             SetDefaultPosition();
             RepaintAll();
         }
 
         private void FrmMain_MouseMove(object sender, MouseEventArgs e)
         {
+            Cursor.Show();
+
             if (!mouseDragStart.HasValue) return;
 
             int horizontalOffset = mouseDragStart.Value.X - e.X;
@@ -330,7 +358,7 @@ namespace comicReader.NET
 
         private void FrmMain_MouseDown(object sender, MouseEventArgs e)
         {
-            if (currentComic == null) return;
+            if (currentArchiveReader == null) return;
 
             mouseDragStart = e.Location;
             originalImagePosition.X = currentHorizontalPosition;

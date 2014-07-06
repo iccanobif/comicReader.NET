@@ -20,9 +20,14 @@ namespace comicReader.NET
 
     public class ArchiveReader
     {
-        static Regex allowedImageExtensions = new Regex(@"\.(jpg|jpeg|png)$", RegexOptions.IgnoreCase);
-        static Regex allowedArchiveExtensions = new Regex(@"\.(zip|rar)$", RegexOptions.IgnoreCase);
-        
+        public enum CollectionMovementDirection
+        {
+            Forward,
+            Backwards
+        }
+
+        static Regex allowedImageExtensions = new Regex(@"\.(jpg|jpeg|png|gif|bmp)$", RegexOptions.IgnoreCase);
+        static Regex allowedArchiveExtensions = new Regex(@"\.(zip|rar|cbr)$", RegexOptions.IgnoreCase);
 
         Comic parentComic = null; //Can be null
         string currentPath;
@@ -38,6 +43,9 @@ namespace comicReader.NET
 
         public ArchiveReader(string path, Comic parentComic)
         {
+            if (!Directory.Exists(path) && !File.Exists(path))
+                throw new FileNotFoundException();
+
             this.currentPath = path;
             this.parentComic = parentComic;
             LoadFileList();
@@ -144,17 +152,28 @@ namespace comicReader.NET
             return GetCurrentFile();
         }
 
-        public void MoveToNextCollection()
+        public void MoveToNextCollection(CollectionMovementDirection direction)
         {
             PopulateParentCollections();
 
             for (int i = 0; i < ParentCollections.Count; i++)
                 if (ParentCollections[i] == currentPath)
-                {
-                    if (i >= ParentCollections.Count - 1)
-                        currentPath = ParentCollections[0];
+                { //Current collection found, moving to the next one
+
+                    if (direction == CollectionMovementDirection.Forward)
+                    {
+                        if (i >= ParentCollections.Count - 1)
+                            currentPath = ParentCollections[0];
+                        else
+                            currentPath = ParentCollections[i + 1];
+                    }
                     else
-                        currentPath = ParentCollections[i + 1];
+                    {
+                        if (i == 0)
+                            currentPath = ParentCollections[ParentCollections.Count - 1];
+                        else
+                            currentPath = ParentCollections[i - 1];
+                    }
 
                     break;
                 }

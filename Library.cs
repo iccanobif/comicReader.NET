@@ -75,6 +75,23 @@ namespace comicReader.NET
             return c.Id;
         }
 
+        public void DeleteComic(string id)
+        {
+            using (SQLiteTransaction trans = conn.BeginTransaction())
+            {
+                using (SQLiteCommand cmd = conn.CreateCommand())
+                {
+                    cmd.Transaction = trans;
+
+                    cmd.CommandText = "DELETE FROM COMICS WHERE GBL_ID = @gbl_id; COMMIT;";
+                    cmd.Parameters.AddWithValue("@gbl_id", id);
+                    cmd.ExecuteNonQuery();
+
+                    //trans.Commit();
+                }
+            }
+        }
+
         public List<Comic> GetComicList()
         {
             using (SQLiteCommand cmd = conn.CreateCommand())
@@ -97,6 +114,18 @@ namespace comicReader.NET
             }
         }
 
+        [Serializable]
+        public class NotExistingComicException : Exception
+        {
+            //public NotExistingComicException() { }
+            //public NotExistingComicException(string message) : base(message) { }
+            //public NotExistingComicException(string message, Exception inner) : base(message, inner) { }
+            //protected NotExistingComicException(
+            //  System.Runtime.Serialization.SerializationInfo info,
+            //  System.Runtime.Serialization.StreamingContext context)
+            //    : base(info, context) { }
+        }
+
         public Comic GetComic(string id)
         {
             using (SQLiteCommand cmd = conn.CreateCommand())
@@ -104,6 +133,11 @@ namespace comicReader.NET
                 cmd.CommandText = "SELECT PATH, TITLE, POSITION FROM COMICS WHERE GBL_ID = @id";
                 cmd.Parameters.AddWithValue("@id", id);
                 SQLiteDataReader reader = cmd.ExecuteReader();
+                if (!reader.HasRows)
+                {
+                    throw new NotExistingComicException();
+                }
+
                 Comic c = new Comic();
                 reader.Read();
                 c.Id = id;
