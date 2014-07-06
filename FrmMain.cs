@@ -217,11 +217,21 @@ namespace comicReader.NET
                     ResizeImage();
                     break;
 
+                // LIBRARY STUFF
+                case Keys.S:
+                    currentLibrary.SaveComic(currentComic);
+                    break;
+
                 default:
                     return;
             }
 
             RepaintAll();
+        }
+
+        private void UpdateComic()
+        {
+            
         }
 
         private void FrmMain_MouseWheel(object sender, MouseEventArgs e)

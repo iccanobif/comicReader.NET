@@ -22,6 +22,7 @@ namespace comicReader.NET
     {
         static Regex allowedExtensions = new Regex(@"\.(jpg|jpeg|png)$", RegexOptions.IgnoreCase);
 
+        Comic parentComic = null; //Cam be null
         string currentPath;
         public string CurrentPath
         {
@@ -33,10 +34,14 @@ namespace comicReader.NET
         public int CurrentPosition { get; set; }
         private bool isArchive;
 
-        public ArchiveReader(string path)
+        public ArchiveReader(string path, Comic parentComic)
         {
             this.currentPath = path;
+            this.parentComic = parentComic;
             LoadFileList();
+
+            if (parentComic != null)
+                CurrentPosition = parentComic.Position;
         }
 
         private void LoadFileList()
@@ -113,6 +118,10 @@ namespace comicReader.NET
             CurrentPosition++;
             if (CurrentPosition >= FileNames.Count)
                 CurrentPosition = 0;
+
+            if (parentComic != null) 
+                parentComic.Position = CurrentPosition;
+
             return GetCurrentFile();
         }
 
@@ -121,6 +130,10 @@ namespace comicReader.NET
             CurrentPosition--;
             if (CurrentPosition < 0)
                 CurrentPosition = FileNames.Count - 1;
+
+            if (parentComic != null) 
+                parentComic.Position = CurrentPosition;
+
             return GetCurrentFile();
         }
 
@@ -140,6 +153,12 @@ namespace comicReader.NET
                 }
 
             LoadFileList();
+
+            if (parentComic != null)
+            {
+                parentComic.Path = currentPath;
+                parentComic.Position = CurrentPosition;
+            }
         }
     }
 }

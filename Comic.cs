@@ -10,7 +10,7 @@ namespace comicReader.NET
         public string Title { get; set; }
         public string Path { get; set; }
         public int Position { get; set; }
-        public long Id { get; set; }
+        public string Id { get; set; }
 
         private DateTime _creationTime;
         public DateTime creationTime
@@ -21,15 +21,15 @@ namespace comicReader.NET
         public Comic()
         {
             _creationTime = DateTime.Now;
+            Id = Guid.NewGuid().ToString();
         }
 
         public ArchiveReader CreateArchiveReader()
         {
-            ArchiveReader output = new ArchiveReader(Path);
+            ArchiveReader output = new ArchiveReader(Path, this);
             output.CurrentPosition = Position;
 
             return output;
         }
-
     }
 }

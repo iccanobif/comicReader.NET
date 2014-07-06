@@ -15,32 +15,71 @@ namespace comicReader.NET
             conn.Open();
             InitializeDb();
         }
-        
+
         private void InitializeDb()
         {
             using (SQLiteCommand cmd = conn.CreateCommand())
             {
-                cmd.CommandText = "CREATE TABLE IF NOT EXISTS COMICS (PATH, TITLE)";
+                cmd.CommandText = "CREATE TABLE IF NOT EXISTS COMICS (GBL_ID, PATH, TITLE, POSITION)";
                 cmd.ExecuteNonQuery();
             }
         }
 
-        public void AddComic(Comic c)
+        /// <summary>
+        /// Add a new Comic object to the database and returns its Global Id
+        /// </summary>
+        /// <param name="c">The Comic object to insert to the database</param>
+        /// <returns>The Global Id of the new comic</returns>
+        public string SaveComic(Comic c)
         {
-            using (SQLiteCommand cmd = conn.CreateCommand())
+            int count;
+
+            //TODO: Use SQlite's "INSERT OR REPLACE" statement
+            using (SQLiteTransaction trans = conn.BeginTransaction())
             {
-                cmd.CommandText = "INSERT INTO COMICS (PATH, TITLE) VALUES (@path, @title)";
-                cmd.Parameters.AddWithValue("@path", c.Path);
-                cmd.Parameters.AddWithValue("@title", c.Title);
-                cmd.ExecuteNonQuery();
+                using (SQLiteCommand cmd = conn.CreateCommand())
+                {
+                    cmd.Transaction = trans;
+
+                    //Check if row already exists
+
+                    cmd.CommandText = "SELECT COUNT(1) FROM COMICS WHERE GBL_ID = @gbl_id";
+                    cmd.Parameters.AddWithValue("@gbl_id", c.Id);
+                    count = Convert.ToInt32(cmd.ExecuteScalar());
+
+                }
+
+                using (SQLiteCommand cmd = conn.CreateCommand())
+                {
+                    cmd.Transaction = trans;
+
+                    if (count == 0)
+                        cmd.CommandText = @"INSERT INTO COMICS (GBL_ID, PATH, TITLE, POSITION) 
+                                                        VALUES (@gbl_id, @path, @title, @position)";
+                    else
+                        cmd.CommandText = @"UPDATE COMICS 
+                                            SET PATH = @path, 
+                                                TITLE = @title, 
+                                                POSITION = @position
+                                            WHERE GBL_ID = @gbl_id";
+                    
+                    cmd.Parameters.AddWithValue("@path", c.Path);
+                    cmd.Parameters.AddWithValue("@title", c.Title);
+                    cmd.Parameters.AddWithValue("@gbl_id", c.Id);
+                    cmd.Parameters.AddWithValue("@position", c.Position);
+                    cmd.ExecuteNonQuery();
+                }
+
+                trans.Commit();
             }
+            return c.Id;
         }
 
         public List<Comic> GetComicList()
         {
             using (SQLiteCommand cmd = conn.CreateCommand())
             {
-                cmd.CommandText = "SELECT ROWID, PATH, TITLE FROM COMICS";
+                cmd.CommandText = "SELECT GBL_ID, PATH, TITLE FROM COMICS ORDER BY UPPER(TITLE)";
                 SQLiteDataReader reader = cmd.ExecuteReader();
 
                 List<Comic> output = new List<Comic>();
@@ -48,7 +87,7 @@ namespace comicReader.NET
                 while (reader.Read())
                 {
                     Comic c = new Comic();
-                    c.Id = (long)(reader["ROWID"]);
+                    c.Id = reader["GBL_ID"].ToString();
                     c.Path = reader["PATH"].ToString();
                     c.Title = reader["TITLE"].ToString();
                     output.Add(c);
@@ -58,11 +97,11 @@ namespace comicReader.NET
             }
         }
 
-        public Comic GetComic(long id)
+        public Comic GetComic(string id)
         {
             using (SQLiteCommand cmd = conn.CreateCommand())
             {
-                cmd.CommandText = "SELECT PATH, TITLE FROM COMICS WHERE ROWID = @id";
+                cmd.CommandText = "SELECT PATH, TITLE, POSITION FROM COMICS WHERE GBL_ID = @id";
                 cmd.Parameters.AddWithValue("@id", id);
                 SQLiteDataReader reader = cmd.ExecuteReader();
                 Comic c = new Comic();
@@ -70,6 +109,7 @@ namespace comicReader.NET
                 c.Id = id;
                 c.Path = reader["PATH"].ToString();
                 c.Title = reader["TITLE"].ToString();
+                c.Position = Convert.ToInt32(reader["POSITION"]);
 
                 return c;
             }

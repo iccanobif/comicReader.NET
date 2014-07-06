@@ -76,7 +76,7 @@
             this.Controls.Add(this.LstImages);
             this.Controls.Add(this.LstFileSystem);
             this.Name = "FrmFileSystemNavigation";
-            this.Text = "FrmFileSystemNavigation";
+            this.Text = "Navigate";
             this.ResumeLayout(false);
 
         }

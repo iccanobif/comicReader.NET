@@ -61,7 +61,7 @@ namespace comicReader.NET
 
             LstFileSystem.Items.Add("..");
 
-            currentArchiveReader = new ArchiveReader(currentPath);
+            currentArchiveReader = new ArchiveReader(currentPath, null);
 
             foreach (string collectionName in currentArchiveReader.SiblingCollections)
                 LstFileSystem.Items.Add(Path.GetFileName(collectionName));

@@ -14,6 +14,7 @@ namespace comicReader.NET
     {
 
         Library library;
+        Comic outputComic = null;
 
         public FrmLibrary(Library l)
         {
@@ -24,25 +25,55 @@ namespace comicReader.NET
         public Comic GetComic()
         {
             this.ShowDialog();
-            return null;
+            return outputComic;
         }
 
         private void FrmLibrary_Load(object sender, EventArgs e)
         {
-
             LstComics.ValueMember = "Id";
             LstComics.DisplayMember = "Title";
             LstComics.DataSource = library.GetComicList();
         }
 
+        private void PopulateComicList()
+        {
+            LstComics.DataSource = library.GetComicList();
+        }
+
         private void BtnAddComic_Click(object sender, EventArgs e)
         {
+            if (TxtComicName.Text.Trim() == string.Empty)
+            {
+                MessageBox.Show("Insert a comic name.");
+                return;
+            }
+
+            if (TxtPath.Text.Trim() == string.Empty)
+            {
+                MessageBox.Show("Insert a path.");
+                return;
+            }
+
+            //FrmFileSystemNavigation navigatorDialog = new FrmFileSystemNavigation();
+            //ArchiveReader reader = navigatorDialog.GetNewReader();
+
+            //if (reader == null) return;
+
             Comic c = new Comic();
             c.Title = TxtComicName.Text;
-            c.Path = "";   //TODO
-            library.AddComic(c);
+            c.Path = TxtPath.Text;
+            c.Position = 0;
+            string newComicId = library.SaveComic(c);
 
-            MessageBox.Show("Saved");
+            PopulateComicList();
+
+            LstComics.SelectedValue = c.Id;
+        }
+
+        private void BtnOk_Click(object sender, EventArgs e)
+        {
+            outputComic = library.GetComic(LstComics.SelectedValue.ToString());
+            Close();
         }
     }
 }
