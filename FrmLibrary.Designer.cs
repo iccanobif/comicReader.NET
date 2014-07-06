@@ -48,7 +48,10 @@
             this.LstComics.Location = new System.Drawing.Point(12, 45);
             this.LstComics.Name = "LstComics";
             this.LstComics.Size = new System.Drawing.Size(673, 407);
-            this.LstComics.TabIndex = 0;
+            this.LstComics.TabIndex = 1;
+            this.LstComics.SelectedIndexChanged += new System.EventHandler(this.LstComics_SelectedIndexChanged);
+            this.LstComics.DoubleClick += new System.EventHandler(this.LstComics_DoubleClick);
+            this.LstComics.KeyUp += new System.Windows.Forms.KeyEventHandler(this.LstComics_KeyUp);
             // 
             // TxtFilter
             // 
@@ -57,7 +60,9 @@
             this.TxtFilter.Location = new System.Drawing.Point(13, 13);
             this.TxtFilter.Name = "TxtFilter";
             this.TxtFilter.Size = new System.Drawing.Size(672, 20);
-            this.TxtFilter.TabIndex = 1;
+            this.TxtFilter.TabIndex = 0;
+            this.TxtFilter.TextChanged += new System.EventHandler(this.TxtFilter_TextChanged);
+            this.TxtFilter.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TxtFilter_KeyDown);
             // 
             // BtnAddComic
             // 
@@ -65,7 +70,7 @@
             this.BtnAddComic.Location = new System.Drawing.Point(626, 491);
             this.BtnAddComic.Name = "BtnAddComic";
             this.BtnAddComic.Size = new System.Drawing.Size(59, 21);
-            this.BtnAddComic.TabIndex = 4;
+            this.BtnAddComic.TabIndex = 5;
             this.BtnAddComic.Text = "Add";
             this.BtnAddComic.UseVisualStyleBackColor = true;
             this.BtnAddComic.Click += new System.EventHandler(this.BtnAddComic_Click);
@@ -77,7 +82,7 @@
             this.TxtComicName.Location = new System.Drawing.Point(88, 492);
             this.TxtComicName.Name = "TxtComicName";
             this.TxtComicName.Size = new System.Drawing.Size(532, 20);
-            this.TxtComicName.TabIndex = 5;
+            this.TxtComicName.TabIndex = 4;
             // 
             // BtnOk
             // 
@@ -118,7 +123,7 @@
             this.TxtPath.Location = new System.Drawing.Point(88, 462);
             this.TxtPath.Name = "TxtPath";
             this.TxtPath.Size = new System.Drawing.Size(532, 20);
-            this.TxtPath.TabIndex = 9;
+            this.TxtPath.TabIndex = 2;
             // 
             // BtnBrowse
             // 
@@ -126,7 +131,7 @@
             this.BtnBrowse.Location = new System.Drawing.Point(626, 461);
             this.BtnBrowse.Name = "BtnBrowse";
             this.BtnBrowse.Size = new System.Drawing.Size(60, 24);
-            this.BtnBrowse.TabIndex = 10;
+            this.BtnBrowse.TabIndex = 3;
             this.BtnBrowse.Text = "Browse";
             this.BtnBrowse.UseVisualStyleBackColor = true;
             // 

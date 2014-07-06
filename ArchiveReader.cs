@@ -20,9 +20,11 @@ namespace comicReader.NET
 
     public class ArchiveReader
     {
-        static Regex allowedExtensions = new Regex(@"\.(jpg|jpeg|png)$", RegexOptions.IgnoreCase);
+        static Regex allowedImageExtensions = new Regex(@"\.(jpg|jpeg|png)$", RegexOptions.IgnoreCase);
+        static Regex allowedArchiveExtensions = new Regex(@"\.(zip|rar)$", RegexOptions.IgnoreCase);
+        
 
-        Comic parentComic = null; //Cam be null
+        Comic parentComic = null; //Can be null
         string currentPath;
         public string CurrentPath
         {
@@ -62,11 +64,13 @@ namespace comicReader.NET
                              select Path.GetFileName(p)).ToList<string>();
 
                 SiblingCollections = Directory.GetDirectories(currentPath).ToList<string>();
-                SiblingCollections.AddRange(Directory.GetFiles(currentPath, "*.zip"));
+                SiblingCollections.AddRange((from names in Directory.GetFiles(currentPath)
+                                             where allowedArchiveExtensions.IsMatch(names)
+                                             select names).ToList<string>());
             }
 
             FileNames = (from names in FileNames
-                         where allowedExtensions.IsMatch(names)
+                         where allowedImageExtensions.IsMatch(names)
                                && !names.StartsWith("__MACOSX")
                          orderby names
                          select names).ToList<string>();
@@ -79,7 +83,10 @@ namespace comicReader.NET
         private void PopulateParentCollections()
         {
             if (isArchive)
-                ParentCollections = Directory.GetFiles(Path.GetDirectoryName(currentPath), "*.zip").ToList<string>();
+                //ParentCollections = Directory.GetFiles(Path.GetDirectoryName(currentPath), allowedArchiveExtensions).ToList<string>();
+                ParentCollections = (from names in Directory.GetFiles(Path.GetDirectoryName(currentPath))
+                                     where allowedArchiveExtensions.IsMatch(names)
+                                     select names).ToList<string>();
             else
                 if (Directory.GetDirectoryRoot(currentPath) == currentPath)
                     ParentCollections = new List<string>();

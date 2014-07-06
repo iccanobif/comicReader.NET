@@ -58,7 +58,7 @@ namespace comicReader.NET
             Debug.Print("Resizing time: " + DateTime.Now.Subtract(start).ToString());
 
             SetWindowTitle(string.Format("{0} - {1}{2}", 
-                                         System.IO.Path.GetFileName(currentArchiveReader.CurrentPath), 
+                                         currentComic != null ? currentComic.Title : System.IO.Path.GetFileName(currentArchiveReader.CurrentPath), 
                                          currentArchiveReader.GetCurrentFileName(),
                                          currentArchiveReader.CurrentPosition == currentArchiveReader.FileNames.Count - 1 ? " [END]" : string.Empty
                                          ));
@@ -216,10 +216,20 @@ namespace comicReader.NET
                     originalBitmap = new Bitmap(new System.IO.MemoryStream(currentArchiveReader.GetCurrentFile()));
                     ResizeImage();
                     break;
-
                 // LIBRARY STUFF
                 case Keys.S:
+                    if (currentComic == null) return;
+
                     currentLibrary.SaveComic(currentComic);
+                    osdText = "SAVED";
+                    break;
+                case Keys.C:
+                    if (currentComic == null) return;
+
+                    currentComic = currentLibrary.GetComic(currentComic.Id);
+                    currentArchiveReader = currentComic.CreateArchiveReader();
+                    originalBitmap = new Bitmap(new System.IO.MemoryStream(currentArchiveReader.GetCurrentFile()));
+                    ResizeImage();
                     break;
 
                 default:

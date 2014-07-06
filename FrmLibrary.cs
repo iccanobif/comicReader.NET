@@ -15,6 +15,7 @@ namespace comicReader.NET
 
         Library library;
         Comic outputComic = null;
+        List<Comic> comicList;
 
         public FrmLibrary(Library l)
         {
@@ -32,12 +33,14 @@ namespace comicReader.NET
         {
             LstComics.ValueMember = "Id";
             LstComics.DisplayMember = "Title";
-            LstComics.DataSource = library.GetComicList();
+            PopulateComicList();
+
+            TxtFilter.Focus();
         }
 
         private void PopulateComicList()
         {
-            LstComics.DataSource = library.GetComicList();
+            LstComics.DataSource = comicList = library.GetComicList();
         }
 
         private void BtnAddComic_Click(object sender, EventArgs e)
@@ -70,10 +73,60 @@ namespace comicReader.NET
             LstComics.SelectedValue = c.Id;
         }
 
-        private void BtnOk_Click(object sender, EventArgs e)
+        private void ConfirmSelection()
         {
             outputComic = library.GetComic(LstComics.SelectedValue.ToString());
             Close();
+        }
+
+        private void BtnOk_Click(object sender, EventArgs e)
+        {
+            ConfirmSelection();
+        }
+
+        private void LstComics_DoubleClick(object sender, EventArgs e)
+        {
+            ConfirmSelection();
+        }
+
+        private void TxtFilter_TextChanged(object sender, EventArgs e)
+        {
+            LstComics.DataSource = (from c in comicList
+                                    where c.Title.ToUpper().Contains(TxtFilter.Text.ToUpper())
+                                    select c).ToList<Comic>();
+
+            if (LstComics.Items.Count > 0)
+                LstComics.SelectedIndex = 0;
+        }
+
+        private void TxtFilter_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.KeyCode)
+            {
+                case Keys.Down:
+                    LstComics.SelectedIndex = 1;
+                    LstComics.Focus();
+                    break;
+
+                case Keys.Enter:
+                    ConfirmSelection();
+                    break;
+            }
+        }
+
+        private void LstComics_KeyUp(object sender, KeyEventArgs e)
+        {
+            switch (e.KeyCode)
+            {
+                case Keys.Enter:
+                    ConfirmSelection();
+                    break;
+            }
+        }
+
+        private void LstComics_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
