@@ -30,6 +30,9 @@ namespace comicReader.NET
         Library currentLibrary = new Library();
         string osdText = string.Empty;
 
+        Point? mouseDragStart;
+        Point originalImagePosition;
+
         public FrmMain()
         {
             InitializeComponent();
@@ -295,6 +298,48 @@ namespace comicReader.NET
         {
             SetDefaultPosition();
             RepaintAll();
+        }
+
+        private void FrmMain_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (!mouseDragStart.HasValue) return;
+
+            int horizontalOffset = mouseDragStart.Value.X - e.X;
+            int verticalOffset = mouseDragStart.Value.Y - e.Y;
+
+            if (resizedBitmap.Width > ClientSize.Width)
+            {
+                currentHorizontalPosition = originalImagePosition.X - horizontalOffset;
+                if (currentHorizontalPosition > 0) 
+                    currentHorizontalPosition = 0;
+                if (currentHorizontalPosition < ClientSize.Width - resizedBitmap.Width)
+                    currentHorizontalPosition = ClientSize.Width - resizedBitmap.Width;
+            }
+
+            if (resizedBitmap.Height > ClientSize.Height)
+            {
+                currentVerticalPosition = originalImagePosition.Y - verticalOffset;
+                if (currentVerticalPosition > 0)
+                    currentVerticalPosition = 0;
+                if (currentVerticalPosition < ClientSize.Height - resizedBitmap.Height)
+                    currentVerticalPosition = ClientSize.Height - resizedBitmap.Height;
+            }
+
+            RepaintAll();
+        }
+
+        private void FrmMain_MouseDown(object sender, MouseEventArgs e)
+        {
+            if (currentComic == null) return;
+
+            mouseDragStart = e.Location;
+            originalImagePosition.X = currentHorizontalPosition;
+            originalImagePosition.Y = currentVerticalPosition;
+        }
+
+        private void FrmMain_MouseUp(object sender, MouseEventArgs e)
+        {
+            mouseDragStart = null;
         }
     }
 }
