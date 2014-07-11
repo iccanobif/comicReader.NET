@@ -52,11 +52,24 @@ namespace comicReader.NET
 
             using (Graphics graphics = Graphics.FromImage(resizedBitmap))
             {
+                graphics.CompositingMode = System.Drawing.Drawing2D.CompositingMode.SourceCopy;
                 graphics.CompositingQuality = System.Drawing.Drawing2D.CompositingQuality.Default;
                 graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
                 graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
 
                 graphics.DrawImage(originalBitmap, 0, 0, resizedBitmap.Width, resizedBitmap.Height);
+
+                //System.Drawing.Imaging.ImageAttributes attr = new System.Drawing.Imaging.ImageAttributes();
+                //System.Drawing.Imaging.ColorMatrix matrix = new System.Drawing.Imaging.ColorMatrix();
+                //attr.SetColorMatrix(matrix);
+                //graphics.DrawImage(originalBitmap, 
+                //                   new Rectangle(0, 0, resizedBitmap.Width, resizedBitmap.Height), 
+                //                   0,
+                //                   0,
+                //                   originalBitmap.Width, 
+                //                   originalBitmap.Height,
+                //                   GraphicsUnit.Pixel,
+                //                   new System.Drawing.Imaging.ImageAttributes());
             }
 
             Debug.Print("Resizing time: " + DateTime.Now.Subtract(start).ToString());
@@ -88,7 +101,7 @@ namespace comicReader.NET
                     return;
                 case Keys.L:
                     // Open library window
-                    FrmLibrary libraryDialog = new FrmLibrary(currentLibrary);
+                    FrmLibrary libraryDialog = new FrmLibrary(currentLibrary, currentArchiveReader == null ? string.Empty : currentArchiveReader.CurrentPath);
                     Comic newComic = libraryDialog.GetComic();
 
                     if (newComic == null) return;
@@ -120,6 +133,8 @@ namespace comicReader.NET
                     currentArchiveReader = newArchiveReader == null ? currentArchiveReader : newArchiveReader;
 
                     if (currentArchiveReader == null) return;
+
+                    if (currentComic != null) currentArchiveReader.SetParentComic(currentComic);
 
                     originalBitmap = new Bitmap(new System.IO.MemoryStream(currentArchiveReader.GetCurrentFile()));
                     ResizeImage();
@@ -218,10 +233,16 @@ namespace comicReader.NET
                     break;
                 // PAGE KEYS
                 case Keys.PageDown:
+                    if (e.Shift)
+                        currentArchiveReader.CurrentPosition = (new Random(DateTime.Now.Millisecond)).Next(currentArchiveReader.FileNames.Count - 1);
+
                     originalBitmap = new Bitmap(new System.IO.MemoryStream(currentArchiveReader.GetNextFile()));
                     ResizeImage();
                     break;
                 case Keys.PageUp:
+                    if (e.Shift)
+                        currentArchiveReader.CurrentPosition = (new Random(DateTime.Now.Millisecond)).Next(currentArchiveReader.FileNames.Count - 1);
+
                     originalBitmap = new Bitmap(new System.IO.MemoryStream(currentArchiveReader.GetPreviousFile()));
                     ResizeImage();
                     break;

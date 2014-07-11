@@ -54,6 +54,18 @@ namespace comicReader.NET
                 CurrentPosition = parentComic.Position;
         }
 
+        public void SetParentComic(Comic parentComic) 
+        {
+            //This sucks, maybe Comic and ArchiveReader should have been a single class. ArchiveReader is too dependent on Comic, whenever i change something in an ArchiveReader,
+            //i have to change it in the Comic too.
+            //TODO: I could remove Comic.Path and Comic.Position and only use a new Comic.Archive of type ArchiveReader. In the GUI, I'll have only a currentComic object and when I open the
+            //navigation window I'll just do a Comic.Archive = newArchiveReader;
+
+            this.parentComic = parentComic;
+            parentComic.Path = currentPath;
+            parentComic.Position = CurrentPosition;
+        }
+
         private void LoadFileList()
         {
             CurrentPosition = 0;

@@ -72,6 +72,8 @@ namespace comicReader.NET
 
         private void LstFileSystem_DoubleClick(object sender, EventArgs e)
         {
+            if (LstFileSystem.SelectedIndex < 0) return;
+
             if (string.IsNullOrEmpty(currentPath))
                 currentPath = LstFileSystem.SelectedItem.ToString();
             else
