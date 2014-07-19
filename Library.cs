@@ -20,7 +20,7 @@ namespace comicReader.NET
         {
             using (SQLiteCommand cmd = conn.CreateCommand())
             {
-                cmd.CommandText = "CREATE TABLE IF NOT EXISTS COMICS (GBL_ID, PATH, TITLE, POSITION)";
+                cmd.CommandText = "CREATE TABLE IF NOT EXISTS COMICS (GBL_ID, PATH, TITLE, POSITION, CREATION_DATE)";
                 cmd.ExecuteNonQuery();
             }
         }
@@ -54,8 +54,11 @@ namespace comicReader.NET
                     cmd.Transaction = trans;
 
                     if (count == 0)
-                        cmd.CommandText = @"INSERT INTO COMICS (GBL_ID, PATH, TITLE, POSITION) 
-                                                        VALUES (@gbl_id, @path, @title, @position)";
+                    {
+                        cmd.CommandText = @"INSERT INTO COMICS (GBL_ID, PATH, TITLE, POSITION, CREATION_DATE) 
+                                                        VALUES (@gbl_id, @path, @title, @position, @creation_date)";
+                        cmd.Parameters.AddWithValue("@creation_date", DateTime.Now);
+                    }
                     else
                         cmd.CommandText = @"UPDATE COMICS 
                                             SET PATH = @path, 
@@ -96,7 +99,7 @@ namespace comicReader.NET
         {
             using (SQLiteCommand cmd = conn.CreateCommand())
             {
-                cmd.CommandText = "SELECT GBL_ID, PATH, TITLE FROM COMICS ORDER BY UPPER(TITLE)";
+                cmd.CommandText = "SELECT GBL_ID, PATH, TITLE, CREATION_DATE FROM COMICS ORDER BY UPPER(TITLE)";
                 SQLiteDataReader reader = cmd.ExecuteReader();
 
                 List<Comic> output = new List<Comic>();
@@ -107,6 +110,7 @@ namespace comicReader.NET
                     c.Id = reader["GBL_ID"].ToString();
                     c.Path = reader["PATH"].ToString();
                     c.Title = reader["TITLE"].ToString();
+                    c.CreationDate = Convert.ToDateTime(reader["CREATION_DATE"]);
                     output.Add(c);
                 }
 

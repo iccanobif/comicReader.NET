@@ -101,7 +101,7 @@ namespace comicReader.NET
                     return;
                 case Keys.L:
                     // Open library window
-                    FrmLibrary libraryDialog = new FrmLibrary(currentLibrary, currentArchiveReader == null ? string.Empty : currentArchiveReader.CurrentPath);
+                    FrmLibrary libraryDialog = new FrmLibrary(currentLibrary, currentComic);
                     Comic newComic = libraryDialog.GetComic();
 
                     if (newComic == null) return;

@@ -11,16 +11,10 @@ namespace comicReader.NET
         public string Path { get; set; }
         public int Position { get; set; }
         public string Id { get; set; }
-
-        private DateTime _creationTime;
-        public DateTime creationTime
-        {
-            get { return _creationTime; }
-        }
+        public DateTime CreationDate { get; set; }
 
         public Comic()
         {
-            _creationTime = DateTime.Now;
             Id = Guid.NewGuid().ToString();
         }
 
