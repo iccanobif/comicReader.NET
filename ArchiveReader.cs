@@ -24,13 +24,13 @@ namespace comicReader.NET
 
         public int Compare(string s1, string s2)
         {
-            string[] splitted1 = (from s in Regex.Split(s1.Replace(" ", ""), @"([0-9]+)|(\.)") 
-                                  where !string.IsNullOrWhiteSpace(s) 
-                                  select s).ToArray<string>();
+            string[] splitted1 = (from s in Regex.Split(s1.Replace(" ", ""), @"([0-9]+)") //split by groups of numeric characters and periods
+                                  where !string.IsNullOrWhiteSpace(s) && s != "." //the idea here is to ignore spaces and periods, so that, for example, xxx15xx < xx15.5xx where x's are non numeric characters
+                                  select s.ToUpper().Replace(".", "")).ToArray<string>();
 
-            string[] splitted2 = (from s in Regex.Split(s2.Replace(" ", ""), @"([0-9]+)|(\.)") 
-                                  where !string.IsNullOrWhiteSpace(s) 
-                                  select s).ToArray<string>();
+            string[] splitted2 = (from s in Regex.Split(s2.Replace(" ", ""), @"([0-9]+)")
+                                  where !string.IsNullOrWhiteSpace(s) && s != "."
+                                  select s.ToUpper().Replace(".", "")).ToArray<string>();
 
             int i = 0;
             while (i < (splitted1.Length < splitted2.Length ? splitted1.Length : splitted2.Length))

@@ -88,7 +88,7 @@ namespace UnitTests
         public void CompareTest4()
         {
             NaturalComparer_Accessor target = new NaturalComparer_Accessor();
-            Assert.IsTrue(target.Compare("chapter5.zip", "chapter5.5.zip") < 0);
+            Assert.IsTrue(target.Compare("Aku no Hana ch017 [C-S].rar", "Aku no Hana ch017.5 [C-S].rar") < 0);
         }
     }
 }
