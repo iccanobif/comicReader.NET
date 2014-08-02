@@ -12,9 +12,50 @@ namespace comicReader.NET
 {
     class NaturalComparer : IComparer<string>
     {
+        bool IsNumber(string s)
+        {
+            return Regex.IsMatch(s, @"\d");
+        }
+
+        bool IsNumber(char c)
+        {
+            return IsNumber(c.ToString());
+        }
+
         public int Compare(string s1, string s2)
         {
-            return s1.CompareTo(s2);
+            string[] splitted1 = (from s in Regex.Split(s1.Replace(" ", ""), @"([0-9]+)|(\.)") 
+                                  where !string.IsNullOrWhiteSpace(s) 
+                                  select s).ToArray<string>();
+
+            string[] splitted2 = (from s in Regex.Split(s2.Replace(" ", ""), @"([0-9]+)|(\.)") 
+                                  where !string.IsNullOrWhiteSpace(s) 
+                                  select s).ToArray<string>();
+
+            int i = 0;
+            while (i < (splitted1.Length < splitted2.Length ? splitted1.Length : splitted2.Length))
+            {
+                if (IsNumber(splitted1[i]) && IsNumber(splitted2[i]))
+                {
+                    int n1 = int.Parse(splitted1[i]);
+                    int n2 = int.Parse(splitted2[i]);
+                    if (n1 != n2)
+                        return n1 - n2;
+                }
+                else
+                {
+                    if (IsNumber(splitted1[i]))
+                        return 1;
+                    if (IsNumber(splitted2[i]))
+                        return -1;
+                    if (splitted1[i].CompareTo(splitted2[i]) != 0)
+                        return splitted1[i].CompareTo(splitted2[i]);
+                }
+
+                i++;
+            }
+
+            return splitted1.Length - splitted2.Length;
         }
     }
 
@@ -27,7 +68,7 @@ namespace comicReader.NET
         }
 
         static Regex allowedImageExtensions = new Regex(@"\.(jpg|jpeg|png|gif|bmp)$", RegexOptions.IgnoreCase);
-        static Regex allowedArchiveExtensions = new Regex(@"\.(zip|rar|cbr)$", RegexOptions.IgnoreCase);
+        static Regex allowedArchiveExtensions = new Regex(@"\.(zip|rar|cbr|cbz|cbt|cba|cb7)$", RegexOptions.IgnoreCase);
 
         Comic parentComic = null; //Can be null
         string currentPath;
