@@ -90,5 +90,14 @@ namespace UnitTests
             NaturalComparer_Accessor target = new NaturalComparer_Accessor();
             Assert.IsTrue(target.Compare("Aku no Hana ch017 [C-S].rar", "Aku no Hana ch017.5 [C-S].rar") < 0);
         }
+
+
+        [TestMethod()]
+        [DeploymentItem("comicReader.NET.exe")]
+        public void CompareTest5()
+        {
+            NaturalComparer_Accessor target = new NaturalComparer_Accessor();
+            Assert.IsTrue(target.Compare("Short-Program-v03c11-12_[Peebs].zip", "Short_Program_v01.zip") > 0);
+        }
     }
 }

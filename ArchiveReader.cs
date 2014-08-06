@@ -26,11 +26,13 @@ namespace comicReader.NET
         {
             string[] splitted1 = (from s in Regex.Split(s1.Replace(" ", ""), @"([0-9]+)") //split by groups of numeric characters and periods
                                   where !string.IsNullOrWhiteSpace(s) && s != "." //the idea here is to ignore spaces and periods, so that, for example, xxx15xx < xx15.5xx where x's are non numeric characters
-                                  select s.ToUpper().Replace(".", "")).ToArray<string>();
+                                  //select s.ToUpper().Replace(".", "")).ToArray<string>();
+                                  select Regex.Replace(s.ToUpper(), @"[\.\-_ ]", "")).ToArray<string>();
 
             string[] splitted2 = (from s in Regex.Split(s2.Replace(" ", ""), @"([0-9]+)")
                                   where !string.IsNullOrWhiteSpace(s) && s != "."
-                                  select s.ToUpper().Replace(".", "")).ToArray<string>();
+                                  //select s.ToUpper().Replace(".", "")).ToArray<string>();
+                                  select Regex.Replace(s.ToUpper(), @"[\.\-_ ]", "")).ToArray<string>();
 
             int i = 0;
             while (i < (splitted1.Length < splitted2.Length ? splitted1.Length : splitted2.Length))
@@ -48,8 +50,10 @@ namespace comicReader.NET
                         return 1;
                     if (IsNumber(splitted2[i]))
                         return -1;
-                    if (splitted1[i].CompareTo(splitted2[i]) != 0)
-                        return splitted1[i].CompareTo(splitted2[i]);
+
+                    int compareResult = splitted1[i].CompareTo(splitted2[i]);
+                    if (compareResult != 0)
+                        return compareResult;
                 }
 
                 i++;
@@ -127,15 +131,14 @@ namespace comicReader.NET
                 SiblingCollections = Directory.GetDirectories(currentPath).ToList<string>();
                 SiblingCollections.AddRange((from names in Directory.GetFiles(currentPath)
                                              where allowedArchiveExtensions.IsMatch(names)
-                                             select names).ToList<string>());
+                                             select names).OrderBy(x => x, new NaturalComparer()).ToList<string>());
             }
 
             FileNames = (from names in FileNames
                          where allowedImageExtensions.IsMatch(names)
                                && !names.StartsWith("__MACOSX")
-                         orderby names
+                         //orderby names
                          select names).ToList<string>();
-
             FileNames.Sort(new NaturalComparer());
 
             PopulateParentCollections();

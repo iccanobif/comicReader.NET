@@ -206,7 +206,8 @@ namespace comicReader.NET
                         currentHorizontalPosition = 0;
                     break;
                 case Keys.NumPad5:
-                    SetDefaultPosition();
+                    currentHorizontalPosition = (this.Width - resizedBitmap.Width) / 2;
+                    currentVerticalPosition = 0;
                     if (ClientSize.Height < resizedBitmap.Height)
                         currentVerticalPosition = maxVerticalOffset;
                     break;
@@ -223,7 +224,8 @@ namespace comicReader.NET
                         currentHorizontalPosition = 0;
                     break;
                 case Keys.NumPad8:
-                    SetDefaultPosition();
+                    currentHorizontalPosition = (this.Width - resizedBitmap.Width) / 2;
+                    currentVerticalPosition = 0;
                     break;
                 case Keys.NumPad9:
                     if (ClientSize.Height < resizedBitmap.Height)
@@ -308,7 +310,10 @@ namespace comicReader.NET
 
         private void SetDefaultPosition()
         {
-            currentHorizontalPosition = (this.Width - resizedBitmap.Width) / 2;
+            if (this.Width > resizedBitmap.Width)
+                currentHorizontalPosition = (this.Width - resizedBitmap.Width) / 2;
+            else
+                currentHorizontalPosition = 0;
             currentVerticalPosition = 0;
         }
 
