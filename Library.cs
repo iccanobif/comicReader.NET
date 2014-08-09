@@ -22,6 +22,16 @@ namespace comicReader.NET
             {
                 cmd.CommandText = "CREATE TABLE IF NOT EXISTS COMICS (GBL_ID, PATH, TITLE, POSITION, CREATION_DATE)";
                 cmd.ExecuteNonQuery();
+
+                /*
+                 * OPERATION_TYPE values:
+                 * I: Insert
+                 * D: Delete
+                 * U: Update
+                 */
+
+                cmd.CommandText = "CREATE TABLE IF NOT EXISTS COMICS_LOG (GBL_ID, PATH, TITLE, POSITION, CREATION_DATE, OPERATION_TYPE, OPERATION_DATE)";
+                cmd.ExecuteNonQuery();
             }
         }
 
@@ -57,15 +67,21 @@ namespace comicReader.NET
                     {
                         cmd.CommandText = @"INSERT INTO COMICS (GBL_ID, PATH, TITLE, POSITION, CREATION_DATE) 
                                                         VALUES (@gbl_id, @path, @title, @position, @creation_date)";
+
                         cmd.Parameters.AddWithValue("@creation_date", DateTime.Now);
                     }
                     else
-                        cmd.CommandText = @"UPDATE COMICS 
-                                            SET PATH = @path, 
-                                                TITLE = @title, 
-                                                POSITION = @position
-                                            WHERE GBL_ID = @gbl_id";
-                    
+                        cmd.CommandText = @"INSERT INTO COMICS_LOG (GBL_ID, PATH, TITLE, POSITION, CREATION_DATE, OPERATION_TYPE, OPERATION_DATE)
+                                            SELECT GBL_ID, PATH, TITLE, POSITION, CREATION_DATE, 'U', @operation_date
+                                            FROM COMICS WHERE GBL_ID = @gbl_id;
+
+                                             UPDATE COMICS 
+                                                SET PATH = @path, 
+                                                    TITLE = @title, 
+                                                    POSITION = @position
+                                                WHERE GBL_ID = @gbl_id";
+
+                    cmd.Parameters.AddWithValue("@operation_date", DateTime.Now);
                     cmd.Parameters.AddWithValue("@path", c.Path);
                     cmd.Parameters.AddWithValue("@title", c.Title);
                     cmd.Parameters.AddWithValue("@gbl_id", c.Id);
@@ -86,12 +102,26 @@ namespace comicReader.NET
                 {
                     cmd.Transaction = trans;
 
-                    cmd.CommandText = "DELETE FROM COMICS WHERE GBL_ID = @gbl_id; COMMIT;";
+                    cmd.CommandText = @"INSERT INTO COMICS_LOG (GBL_ID, PATH, TITLE, POSITION, CREATION_DATE, OPERATION_TYPE, OPERATION_DATE)
+                                        SELECT GBL_ID, PATH, TITLE, POSITION, CREATION_DATE, 'D', @operation_date
+                                        FROM COMICS WHERE GBL_ID = @gbl_id; ";
+                    cmd.Parameters.AddWithValue("@gbl_id", id);
+                    cmd.Parameters.AddWithValue("@operation_date", DateTime.Now);
+
+                    cmd.ExecuteNonQuery();
+                }
+
+                using (SQLiteCommand cmd = conn.CreateCommand())
+                {
+                    cmd.Transaction = trans;
+
+                    //cmd.CommandText = "DELETE FROM COMICS WHERE GBL_ID = @gbl_id; COMMIT;"; //perche' avevo spostato la commit dentro il comando?
+                    cmd.CommandText = "DELETE FROM COMICS WHERE GBL_ID = @gbl_id;";
                     cmd.Parameters.AddWithValue("@gbl_id", id);
                     cmd.ExecuteNonQuery();
-
-                    //trans.Commit();
                 }
+
+                trans.Commit();
             }
         }
 
@@ -121,13 +151,6 @@ namespace comicReader.NET
         [Serializable]
         public class NotExistingComicException : Exception
         {
-            //public NotExistingComicException() { }
-            //public NotExistingComicException(string message) : base(message) { }
-            //public NotExistingComicException(string message, Exception inner) : base(message, inner) { }
-            //protected NotExistingComicException(
-            //  System.Runtime.Serialization.SerializationInfo info,
-            //  System.Runtime.Serialization.StreamingContext context)
-            //    : base(info, context) { }
         }
 
         public Comic GetComic(string id)
