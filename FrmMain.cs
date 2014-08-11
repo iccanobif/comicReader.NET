@@ -296,10 +296,21 @@ namespace comicReader.NET
 
         private void FrmMain_MouseWheel(object sender, MouseEventArgs e)
         {
+            int maxVerticalOffset = ClientSize.Height - resizedBitmap.Height;
+
             if (e.Delta < 0)
-                FrmMain_KeyDown(null, new KeyEventArgs(Keys.Down));
+            {
+                currentVerticalPosition -= 100;
+                if (currentVerticalPosition <= maxVerticalOffset) currentVerticalPosition = maxVerticalOffset;
+            }
             else
-                FrmMain_KeyDown(null, new KeyEventArgs(Keys.Up));
+            {
+                currentVerticalPosition += 100;
+                if (currentVerticalPosition > 0) currentVerticalPosition = 0;
+            }
+
+            RepaintAll();
+
         }
 
         private void RepaintAll()

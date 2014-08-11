@@ -115,7 +115,6 @@ namespace comicReader.NET
                 {
                     cmd.Transaction = trans;
 
-                    //cmd.CommandText = "DELETE FROM COMICS WHERE GBL_ID = @gbl_id; COMMIT;"; //perche' avevo spostato la commit dentro il comando?
                     cmd.CommandText = "DELETE FROM COMICS WHERE GBL_ID = @gbl_id;";
                     cmd.Parameters.AddWithValue("@gbl_id", id);
                     cmd.ExecuteNonQuery();
