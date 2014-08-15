@@ -83,6 +83,8 @@ namespace comicReader.NET
 
         private void ConfirmSelection()
         {
+            if (LstComics.SelectedIndex < 0) return;
+
             outputComic = library.GetComic(LstComics.SelectedValue.ToString());
             Close();
         }
