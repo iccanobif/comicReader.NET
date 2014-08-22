@@ -99,5 +99,6 @@ namespace UnitTests
             NaturalComparer_Accessor target = new NaturalComparer_Accessor();
             Assert.IsTrue(target.Compare("Short-Program-v03c11-12_[Peebs].zip", "Short_Program_v01.zip") > 0);
         }
+
     }
 }

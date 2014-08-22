@@ -46,6 +46,7 @@ namespace comicReader.NET
                 }
                 else
                 {
+                    //this is to handle non integer chapter numbers (ex. xxx15xx < xx15.5xx)
                     if (IsNumber(splitted1[i]))
                         return 1;
                     if (IsNumber(splitted2[i]))
@@ -72,7 +73,7 @@ namespace comicReader.NET
         }
 
         static Regex allowedImageExtensions = new Regex(@"\.(jpg|jpeg|png|gif|bmp)$", RegexOptions.IgnoreCase);
-        static Regex allowedArchiveExtensions = new Regex(@"\.(zip|rar|cbr|cbz|cbt|cba|cb7)$", RegexOptions.IgnoreCase);
+        static Regex allowedArchiveExtensions = new Regex(@"\.(zip|rar|cbr|cbz|cbt|cba|cb7|7z)$", RegexOptions.IgnoreCase);
 
         Comic parentComic = null; //Can be null
         string currentPath;
