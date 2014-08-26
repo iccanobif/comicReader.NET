@@ -128,7 +128,15 @@ namespace comicReader.NET
         {
             using (SQLiteCommand cmd = conn.CreateCommand())
             {
-                cmd.CommandText = "SELECT GBL_ID, PATH, TITLE, CREATION_DATE FROM COMICS ORDER BY CREATION_DATE DESC, UPPER(TITLE)";
+                cmd.CommandText = @"SELECT C.GBL_ID, 
+                                           C.PATH, 
+                                           C.TITLE, 
+                                           C.CREATION_DATE,
+                                           LOG.OPERATION_DATE
+                                      FROM COMICS C LEFT OUTER JOIN COMICS_LOG LOG
+                                        ON C.GBL_ID = LOG.GBL_ID
+                                     WHERE (LOG.OPERATION_DATE IS NULL OR LOG.OPERATION_DATE = (SELECT MAX(OPERATION_DATE) FROM COMICS_LOG WHERE GBL_ID = LOG.GBL_ID))
+                                      ORDER BY LOG.OPERATION_DATE DESC, UPPER(C.TITLE)";
                 SQLiteDataReader reader = cmd.ExecuteReader();
 
                 List<Comic> output = new List<Comic>();

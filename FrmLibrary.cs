@@ -24,6 +24,7 @@ namespace comicReader.NET
 
             LstComics.ValueMember = "Id";
             LstComics.DisplayMember = "Title";
+
             PopulateComicList();
 
             TxtFilter.Focus();
@@ -40,12 +41,7 @@ namespace comicReader.NET
             this.ShowDialog();
             return outputComic;
         }
-
-        private void FrmLibrary_Load(object sender, EventArgs e)
-        {
-           
-        }
-
+        
         private void PopulateComicList()
         {
             LstComics.DataSource = comicList = library.GetComicList();
@@ -151,5 +147,6 @@ namespace comicReader.NET
             if (LstComics.Items.Count > 0)
                 LstComics.SelectedIndex = LstComics.Items.Count - 1 > previousSelectedIndex ? previousSelectedIndex : LstComics.Items.Count - 1;
         }
+
     }
 }

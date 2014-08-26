@@ -162,7 +162,6 @@
             this.Controls.Add(this.LstComics);
             this.Name = "FrmLibrary";
             this.Text = "Comic Library";
-            this.Load += new System.EventHandler(this.FrmLibrary_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 
