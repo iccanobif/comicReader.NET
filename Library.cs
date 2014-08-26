@@ -136,7 +136,7 @@ namespace comicReader.NET
                                       FROM COMICS C LEFT OUTER JOIN COMICS_LOG LOG
                                         ON C.GBL_ID = LOG.GBL_ID
                                      WHERE (LOG.OPERATION_DATE IS NULL OR LOG.OPERATION_DATE = (SELECT MAX(OPERATION_DATE) FROM COMICS_LOG WHERE GBL_ID = LOG.GBL_ID))
-                                      ORDER BY LOG.OPERATION_DATE DESC, UPPER(C.TITLE)";
+                                      ORDER BY LOG.OPERATION_DATE DESC, C.CREATION_DATE, UPPER(C.TITLE)";
                 SQLiteDataReader reader = cmd.ExecuteReader();
 
                 List<Comic> output = new List<Comic>();
