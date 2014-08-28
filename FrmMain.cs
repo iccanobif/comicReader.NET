@@ -74,9 +74,9 @@ namespace comicReader.NET
 
             Debug.Print("Resizing time: " + DateTime.Now.Subtract(start).ToString());
 
-            SetWindowTitle(string.Format("{0} - {1}{2}", 
-                                         //currentComic != null ? currentComic.Title : System.IO.Path.GetFileName(currentArchiveReader.CurrentPath), 
-                                         System.IO.Path.GetFileName(currentArchiveReader.CurrentPath), 
+            SetWindowTitle(string.Format("{0} - {1}{2}",
+                //currentComic != null ? currentComic.Title : System.IO.Path.GetFileName(currentArchiveReader.CurrentPath), 
+                                         System.IO.Path.GetFileName(currentArchiveReader.CurrentPath),
                                          currentArchiveReader.GetCurrentFileName(),
                                          currentArchiveReader.CurrentPosition == currentArchiveReader.FileNames.Count - 1 ? " [END]" : string.Empty
                                          ));
@@ -101,11 +101,14 @@ namespace comicReader.NET
                     return;
                 case Keys.L:
                     // Open library window
-                    FrmLibrary libraryDialog = new FrmLibrary(currentLibrary, currentComic);
+                    FrmLibrary libraryDialog = new FrmLibrary(currentLibrary, 
+                                                              currentArchiveReader == null ? null : currentArchiveReader.CurrentPath,
+                                                              currentComic == null ? null : currentComic.Id);
+
                     Comic newComic = libraryDialog.GetComic();
 
                     if (newComic == null) return;
-                    
+
                     currentComic = newComic;
                     try
                     {
@@ -291,7 +294,7 @@ namespace comicReader.NET
 
         private void UpdateComic()
         {
-            
+
         }
 
         private void FrmMain_MouseWheel(object sender, MouseEventArgs e)
@@ -375,7 +378,7 @@ namespace comicReader.NET
             if (resizedBitmap.Width > ClientSize.Width)
             {
                 currentHorizontalPosition = originalImagePosition.X - horizontalOffset;
-                if (currentHorizontalPosition > 0) 
+                if (currentHorizontalPosition > 0)
                     currentHorizontalPosition = 0;
                 if (currentHorizontalPosition < ClientSize.Width - resizedBitmap.Width)
                     currentHorizontalPosition = ClientSize.Width - resizedBitmap.Width;
@@ -406,5 +409,26 @@ namespace comicReader.NET
         {
             mouseDragStart = null;
         }
+
+        private void FrmMain_DragDrop(object sender, DragEventArgs e)
+        {
+
+            string[] filenames = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+            currentArchiveReader = new ArchiveReader(filenames[0], null);
+
+            if (currentComic != null) currentArchiveReader.SetParentComic(currentComic);
+
+            originalBitmap = new Bitmap(new System.IO.MemoryStream(currentArchiveReader.GetCurrentFile()));
+            ResizeImage();
+            RepaintAll();
+        }
+
+        private void FrmMain_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                e.Effect = DragDropEffects.Copy;
+        }
+
     }
 }

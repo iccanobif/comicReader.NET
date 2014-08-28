@@ -17,7 +17,7 @@ namespace comicReader.NET
         Comic outputComic = null;
         List<Comic> comicList;
 
-        public FrmLibrary(Library l, Comic inputComic)
+        public FrmLibrary(Library l, string defaultPath, string defaultComicId)
         {
             InitializeComponent();
             library = l;
@@ -29,11 +29,11 @@ namespace comicReader.NET
 
             TxtFilter.Focus();
 
-            if (inputComic != null)
-            {
-                TxtPath.Text = inputComic.Path;
-                LstComics.SelectedValue = inputComic.Id;
-            }
+            if (defaultPath != null)
+                TxtPath.Text = defaultPath;
+
+            if (defaultComicId != null)
+                LstComics.SelectedValue = defaultComicId;
         }
 
         public Comic GetComic()
