@@ -8,12 +8,25 @@ namespace comicReader.NET
 {
     public class NaturalComparer : IComparer<string>
     {
-        bool IsNumber(string s)
+        public enum NaturalComparerMode
+        {
+            DirectoryNames,
+            FileNames
+        }
+
+        NaturalComparerMode currentComparerMode;
+
+        public NaturalComparer(NaturalComparerMode mode)
+        {
+            currentComparerMode = mode;
+        }
+
+        private bool IsNumber(string s)
         {
             return Regex.IsMatch(s, @"\d");
         }
 
-        bool IsNumber(char c)
+        private bool IsNumber(char c)
         {
             return IsNumber(c.ToString());
         }
@@ -28,13 +41,27 @@ namespace comicReader.NET
             //                      where !string.IsNullOrWhiteSpace(s) && s != "."
             //                      select s).ToArray<string>();
 
-            string[] splitted1 = (from s in Regex.Split(Regex.Replace(s1.ToUpper(), @"[\-_ ]", ""), @"([0-9]+|\.)") //split by groups of numeric characters and periods
+            string cleanedS1 = Regex.Replace(s1.ToUpper(), @"[\-_ ]", "");
+            string cleanedS2 = Regex.Replace(s2.ToUpper(), @"[\-_ ]", "");
+
+            string[] splitted1 = (from s in Regex.Split(cleanedS1, @"([0-9]+|\.)") //split by groups of numeric characters and periods
                                   where !string.IsNullOrWhiteSpace(s) && s != "." //the idea here is to ignore spaces and periods, so that, for example, xxx15xx < xx15.5xx where x's are non numeric characters
                                   select s).ToArray<string>();
 
-            string[] splitted2 = (from s in Regex.Split(Regex.Replace(s2.ToUpper(), @"[\-_ ]", ""), @"([0-9]+|\.)")
+            string[] splitted2 = (from s in Regex.Split(cleanedS2, @"([0-9]+|\.)")
                                   where !string.IsNullOrWhiteSpace(s) && s != "."
                                   select s).ToArray<string>();
+
+            if (currentComparerMode == NaturalComparerMode.FileNames)
+            {
+                //If the strings I'm comparing are filenames (eg. "b\altan_Pagina_018.jpg" and "b\altan_Pagina_018b.jpg") I remove the extension, so that
+                //in the above example 018 comes before 018b (longer names should come after shorter ones)
+                if (splitted1.Length > 1)
+                    splitted1[splitted1.Length - 1] = string.Empty;
+
+                if (splitted2.Length > 1)
+                    splitted2[splitted2.Length - 1] = string.Empty;
+            }
 
             int i = 0;
             while (i < (splitted1.Length < splitted2.Length ? splitted1.Length : splitted2.Length))

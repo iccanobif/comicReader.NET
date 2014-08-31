@@ -79,7 +79,7 @@ namespace comicReader.NET
                 SiblingCollections = Directory.GetDirectories(currentPath).ToList<string>();
                 SiblingCollections.AddRange((from names in Directory.GetFiles(currentPath)
                                              where allowedArchiveExtensions.IsMatch(names)
-                                             select names).OrderBy(x => x, new NaturalComparer()).ToList<string>());
+                                             select names).OrderBy(x => x, new NaturalComparer(NaturalComparer.NaturalComparerMode.FileNames)).ToList<string>());
             }
 
             FileNames = (from names in FileNames
@@ -87,7 +87,7 @@ namespace comicReader.NET
                                && !names.StartsWith("__MACOSX")
                          //orderby names
                          select names).ToList<string>();
-            FileNames.Sort(new NaturalComparer());
+            FileNames.Sort(new NaturalComparer(NaturalComparer.NaturalComparerMode.FileNames));
 
             PopulateParentCollections();
         }
@@ -105,7 +105,7 @@ namespace comicReader.NET
                 else
                     ParentCollections = Directory.GetDirectories(Path.GetDirectoryName(currentPath)).ToList<string>();
 
-            ParentCollections.Sort(new NaturalComparer());
+            ParentCollections.Sort(new NaturalComparer(NaturalComparer.NaturalComparerMode.DirectoryNames));
         }
 
         public string GetCurrentFileName()

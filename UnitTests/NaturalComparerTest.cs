@@ -63,7 +63,7 @@ namespace UnitTests
         [DeploymentItem("comicReader.NET.exe")]
         public void CompareTest1()
         {
-            NaturalComparer target = new NaturalComparer();
+            NaturalComparer target = new NaturalComparer(NaturalComparer.NaturalComparerMode.DirectoryNames);
             Assert.IsTrue(target.Compare("ciao01test", "ciao02aol") < 0);
         }
 
@@ -71,7 +71,7 @@ namespace UnitTests
         [DeploymentItem("comicReader.NET.exe")]
         public void CompareTest2()
         {
-            NaturalComparer target = new NaturalComparer();
+            NaturalComparer target = new NaturalComparer(NaturalComparer.NaturalComparerMode.DirectoryNames);
             Assert.IsTrue(target.Compare("shit2", "shit12") < 0);
         }
 
@@ -79,7 +79,7 @@ namespace UnitTests
         [DeploymentItem("comicReader.NET.exe")]
         public void CompareTest3()
         {
-            NaturalComparer target = new NaturalComparer();
+            NaturalComparer target = new NaturalComparer(NaturalComparer.NaturalComparerMode.DirectoryNames);
             Assert.IsTrue(target.Compare("shit2lol134", "shit2lol54") > 0);
         }
 
@@ -87,7 +87,7 @@ namespace UnitTests
         [DeploymentItem("comicReader.NET.exe")]
         public void CompareTest4()
         {
-            NaturalComparer target = new NaturalComparer();
+            NaturalComparer target = new NaturalComparer(NaturalComparer.NaturalComparerMode.FileNames);
             Assert.IsTrue(target.Compare("Aku no Hana ch017 [C-S].rar", "Aku no Hana ch017.5 [C-S].rar") < 0);
         }
 
@@ -96,7 +96,7 @@ namespace UnitTests
         [DeploymentItem("comicReader.NET.exe")]
         public void CompareTest5()
         {
-            NaturalComparer target = new NaturalComparer();
+            NaturalComparer target = new NaturalComparer(NaturalComparer.NaturalComparerMode.FileNames);
             Assert.IsTrue(target.Compare("Short-Program-v03c11-12_[Peebs].zip", "Short_Program_v01.zip") > 0);
         }
         
@@ -104,7 +104,7 @@ namespace UnitTests
         [DeploymentItem("comicReader.NET.exe")]
         public void CompareTest6()
         {
-            NaturalComparer target = new NaturalComparer();
+            NaturalComparer target = new NaturalComparer(NaturalComparer.NaturalComparerMode.FileNames);
             Assert.IsTrue(target.Compare(@"b\altan_Pagina_018.jpg", @"b\altan_Pagina_018b.jpg") < 0);
         }
     }
