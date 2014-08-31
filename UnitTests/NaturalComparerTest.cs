@@ -63,7 +63,7 @@ namespace UnitTests
         [DeploymentItem("comicReader.NET.exe")]
         public void CompareTest1()
         {
-            NaturalComparer_Accessor target = new NaturalComparer_Accessor();
+            NaturalComparer target = new NaturalComparer();
             Assert.IsTrue(target.Compare("ciao01test", "ciao02aol") < 0);
         }
 
@@ -71,7 +71,7 @@ namespace UnitTests
         [DeploymentItem("comicReader.NET.exe")]
         public void CompareTest2()
         {
-            NaturalComparer_Accessor target = new NaturalComparer_Accessor();
+            NaturalComparer target = new NaturalComparer();
             Assert.IsTrue(target.Compare("shit2", "shit12") < 0);
         }
 
@@ -79,7 +79,7 @@ namespace UnitTests
         [DeploymentItem("comicReader.NET.exe")]
         public void CompareTest3()
         {
-            NaturalComparer_Accessor target = new NaturalComparer_Accessor();
+            NaturalComparer target = new NaturalComparer();
             Assert.IsTrue(target.Compare("shit2lol134", "shit2lol54") > 0);
         }
 
@@ -87,7 +87,7 @@ namespace UnitTests
         [DeploymentItem("comicReader.NET.exe")]
         public void CompareTest4()
         {
-            NaturalComparer_Accessor target = new NaturalComparer_Accessor();
+            NaturalComparer target = new NaturalComparer();
             Assert.IsTrue(target.Compare("Aku no Hana ch017 [C-S].rar", "Aku no Hana ch017.5 [C-S].rar") < 0);
         }
 
@@ -96,9 +96,16 @@ namespace UnitTests
         [DeploymentItem("comicReader.NET.exe")]
         public void CompareTest5()
         {
-            NaturalComparer_Accessor target = new NaturalComparer_Accessor();
+            NaturalComparer target = new NaturalComparer();
             Assert.IsTrue(target.Compare("Short-Program-v03c11-12_[Peebs].zip", "Short_Program_v01.zip") > 0);
         }
-
+        
+        [TestMethod()]
+        [DeploymentItem("comicReader.NET.exe")]
+        public void CompareTest6()
+        {
+            NaturalComparer target = new NaturalComparer();
+            Assert.IsTrue(target.Compare(@"b\altan_Pagina_018.jpg", @"b\altan_Pagina_018b.jpg") < 0);
+        }
     }
 }
