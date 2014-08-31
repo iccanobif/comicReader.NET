@@ -33,24 +33,14 @@ namespace comicReader.NET
 
         public int Compare(string s1, string s2)
         {
-            //string[] splitted1 = (from s in Regex.Split(Regex.Replace(s1.ToUpper(), @"[\.\-_ ]", ""), @"([0-9]+)") //split by groups of numeric characters and periods
-            //                      where !string.IsNullOrWhiteSpace(s) && s != "." //the idea here is to ignore spaces and periods, so that, for example, xxx15xx < xx15.5xx where x's are non numeric characters
-            //                      select s).ToArray<string>();
-
-            //string[] splitted2 = (from s in Regex.Split(Regex.Replace(s2.ToUpper(), @"[\.\-_ ]", ""), @"([0-9]+)")
-            //                      where !string.IsNullOrWhiteSpace(s) && s != "."
-            //                      select s).ToArray<string>();
-
-            string cleanedS1 = Regex.Replace(s1.ToUpper(), @"[\-_ ]", "");
-            string cleanedS2 = Regex.Replace(s2.ToUpper(), @"[\-_ ]", "");
-
-            string[] splitted1 = (from s in Regex.Split(cleanedS1, @"([0-9]+|\.)") //split by groups of numeric characters and periods
+            string[] splitted1 = (from s in Regex.Split(s1, @"([0-9]+|\.)") //split by groups of numeric characters and periods
                                   where !string.IsNullOrWhiteSpace(s) && s != "." //the idea here is to ignore spaces and periods, so that, for example, xxx15xx < xx15.5xx where x's are non numeric characters
-                                  select s).ToArray<string>();
+                                  select Regex.Replace(s.ToUpper(), @"[\[\]\(\)\-_ ]", "") //clean characters i'd rather ignore in the comparison (whitespace, dashes, underscores...)
+                                  ).ToArray<string>(); 
 
-            string[] splitted2 = (from s in Regex.Split(cleanedS2, @"([0-9]+|\.)")
+            string[] splitted2 = (from s in Regex.Split(s2, @"([0-9]+|\.)")
                                   where !string.IsNullOrWhiteSpace(s) && s != "."
-                                  select s).ToArray<string>();
+                                  select Regex.Replace(s.ToUpper(), @"[\[\]\(\)\-_ ]", "")).ToArray<string>();
 
             if (currentComparerMode == NaturalComparerMode.FileNames)
             {
