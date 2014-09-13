@@ -115,10 +115,17 @@ namespace comicReader.NET
             switch (e.KeyCode)
             {
                 case Keys.Down:
-                    LstComics.SelectedIndex = 1;
+                    if (LstComics.SelectedIndex == LstComics.Items.Count - 1)
+                        LstComics.SelectedIndex = 0;
+                    else
+                        LstComics.SelectedIndex += 1;
                     LstComics.Focus();
                     break;
-                case Keys.PageDown:
+                case Keys.Up:
+                    if (LstComics.SelectedIndex == 0)
+                        LstComics.SelectedIndex = LstComics.Items.Count - 1;
+                    else
+                        LstComics.SelectedIndex -= 1;
                     LstComics.Focus();
                     break;
                 case Keys.Enter:

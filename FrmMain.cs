@@ -101,7 +101,7 @@ namespace comicReader.NET
                     return;
                 case Keys.L:
                     // Open library window
-                    FrmLibrary libraryDialog = new FrmLibrary(currentLibrary, 
+                    FrmLibrary libraryDialog = new FrmLibrary(currentLibrary,
                                                               currentArchiveReader == null ? null : currentArchiveReader.CurrentPath,
                                                               currentComic == null ? null : currentComic.Id);
 
@@ -121,7 +121,7 @@ namespace comicReader.NET
                     {
                         currentArchiveReader = null;
                         SetWindowTitle(currentComic.Title);
-                        MessageBox.Show("Path does not exists!");
+                        MessageBox.Show(string.Format("Path {0} does not exists!", currentComic.Path));
                     }
                     return;
                 case Keys.N:
@@ -280,7 +280,18 @@ namespace comicReader.NET
                         return;
                     }
 
-                    currentArchiveReader = currentComic.CreateArchiveReader();
+                    try
+                    {
+                        currentArchiveReader = currentComic.CreateArchiveReader();
+                    }
+                    catch (FileNotFoundException)
+                    {
+                        currentArchiveReader = null;
+                        SetWindowTitle(currentComic.Title);
+                        MessageBox.Show(string.Format("Path {0} does not exists!", currentComic.Path));
+                        return;
+                    }
+
                     originalBitmap = new Bitmap(new System.IO.MemoryStream(currentArchiveReader.GetCurrentFile()));
                     ResizeImage();
                     break;
