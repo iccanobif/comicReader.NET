@@ -58,8 +58,15 @@ namespace comicReader.NET
             {
                 if (IsNumber(splitted1[i]) && IsNumber(splitted2[i]))
                 {
-                    int n1 = int.Parse(splitted1[i]);
-                    int n2 = int.Parse(splitted2[i]);
+                    int n1 = 0, n2 = 0;
+                    bool error = false;
+
+                    error = error || !int.TryParse(splitted1[i], out n1);
+                    error = error || !int.TryParse(splitted2[i], out n2);
+
+                    if (error)
+                        return splitted1[i].TrimStart('0').CompareTo(splitted2[i].TrimStart('0'));
+
                     if (n1 != n2)
                         return n1 - n2;
                 }
