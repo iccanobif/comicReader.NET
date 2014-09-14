@@ -91,5 +91,13 @@ namespace UnitTests
             NaturalComparer target = new NaturalComparer(NaturalComparer.NaturalComparerMode.FileNames);
             Assert.IsTrue(target.Compare(@"Series [groupName] - Chapter 1.zip", @"Series (groupName) - Chapter 2.rar") < 0);
         }
+
+
+        [TestMethod()]
+        public void CompareTest10()
+        {
+            NaturalComparer target = new NaturalComparer(NaturalComparer.NaturalComparerMode.FileNames);
+            Assert.IsTrue(target.Compare(@"1409698850351.jpg", @"1409699120855.jpg") < 0);
+        }
     }
 }
