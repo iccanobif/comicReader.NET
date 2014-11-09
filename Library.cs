@@ -20,7 +20,7 @@ namespace comicReader.NET
         {
             using (SQLiteCommand cmd = conn.CreateCommand())
             {
-                cmd.CommandText = "CREATE TABLE IF NOT EXISTS COMICS (GBL_ID, PATH, TITLE, POSITION, CREATION_DATE)";
+                cmd.CommandText = "CREATE TABLE IF NOT EXISTS COMICS (GBL_ID, PATH, TITLE, POSITION, CREATION_DATE, LAST_EDIT_DATE)";
                 cmd.ExecuteNonQuery();
 
                 /*
@@ -65,12 +65,13 @@ namespace comicReader.NET
 
                     if (count == 0)
                     {
-                        cmd.CommandText = @"INSERT INTO COMICS (GBL_ID, PATH, TITLE, POSITION, CREATION_DATE) 
-                                                        VALUES (@gbl_id, @path, @title, @position, @creation_date)";
+                        cmd.CommandText = @"INSERT INTO COMICS (GBL_ID, PATH, TITLE, POSITION, CREATION_DATE, LAST_EDIT_DATE) 
+                                                        VALUES (@gbl_id, @path, @title, @position, @creation_date, @creation_date)";
 
                         cmd.Parameters.AddWithValue("@creation_date", DateTime.Now);
                     }
                     else
+                        //TODO: don't insert a new log if the most recent one points to the same path
                         cmd.CommandText = @"INSERT INTO COMICS_LOG (GBL_ID, PATH, TITLE, POSITION, CREATION_DATE, OPERATION_TYPE, OPERATION_DATE)
                                             SELECT GBL_ID, PATH, TITLE, POSITION, CREATION_DATE, 'U', @operation_date
                                             FROM COMICS WHERE GBL_ID = @gbl_id;
@@ -78,7 +79,8 @@ namespace comicReader.NET
                                              UPDATE COMICS 
                                                 SET PATH = @path, 
                                                     TITLE = @title, 
-                                                    POSITION = @position
+                                                    POSITION = @position,
+                                                    LAST_EDIT_DATE = @operation_date
                                                 WHERE GBL_ID = @gbl_id";
 
                     cmd.Parameters.AddWithValue("@operation_date", DateTime.Now);
@@ -132,11 +134,9 @@ namespace comicReader.NET
                                            C.PATH, 
                                            C.TITLE, 
                                            C.CREATION_DATE,
-                                           LOG.OPERATION_DATE
-                                      FROM COMICS C LEFT OUTER JOIN COMICS_LOG LOG
-                                        ON C.GBL_ID = LOG.GBL_ID
-                                     WHERE (LOG.OPERATION_DATE IS NULL OR LOG.OPERATION_DATE = (SELECT MAX(OPERATION_DATE) FROM COMICS_LOG WHERE GBL_ID = LOG.GBL_ID))
-                                      ORDER BY LOG.OPERATION_DATE DESC, C.CREATION_DATE, UPPER(C.TITLE)";
+                                           LAST_EDIT_DATE
+                                      FROM COMICS C
+                                  ORDER BY LAST_EDIT_DATE DESC, C.CREATION_DATE, UPPER(C.TITLE)";
                 SQLiteDataReader reader = cmd.ExecuteReader();
 
                 List<Comic> output = new List<Comic>();
