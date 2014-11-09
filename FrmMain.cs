@@ -366,6 +366,7 @@ namespace comicReader.NET
 
         private void FrmMain_Paint(object sender, PaintEventArgs e)
         {
+            //passare a PaintImage() e.ClipRectangle, in modo da disegnare solo il pezzo di immagine che serve
             PaintImage(e.Graphics);
         }
 

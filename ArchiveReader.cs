@@ -19,8 +19,8 @@ namespace comicReader.NET
             Backwards
         }
 
-        static Regex allowedImageExtensions = new Regex(@"\.(jpg|jpeg|png|gif|bmp)$", RegexOptions.IgnoreCase);
-        static Regex allowedArchiveExtensions = new Regex(@"\.(zip|rar|cbr|cbz|cbt|cba|cb7|7z)$", RegexOptions.IgnoreCase);
+        public static Regex allowedImageExtensions = new Regex(@"\.(jpg|jpeg|png|gif|bmp)$", RegexOptions.IgnoreCase);
+        public static Regex allowedArchiveExtensions = new Regex(@"\.(zip|rar|cbr|cbz|cbt|cba|cb7|7z)$", RegexOptions.IgnoreCase);
 
         Comic parentComic = null; //Can be null
         string currentPath;
@@ -79,7 +79,7 @@ namespace comicReader.NET
                 SiblingCollections = Directory.GetDirectories(currentPath).ToList<string>();
                 SiblingCollections.AddRange((from names in Directory.GetFiles(currentPath)
                                              where allowedArchiveExtensions.IsMatch(names)
-                                             select names).OrderBy(x => x, new NaturalComparer(NaturalComparer.NaturalComparerMode.FileNames)).ToList<string>());
+                                             select names).OrderBy(x => x, new NaturalComparer()).ToList<string>());
             }
 
             FileNames = (from names in FileNames
@@ -87,7 +87,7 @@ namespace comicReader.NET
                                && !names.StartsWith("__MACOSX")
                          //orderby names
                          select names).ToList<string>();
-            FileNames.Sort(new NaturalComparer(NaturalComparer.NaturalComparerMode.FileNames));
+            FileNames.Sort(new NaturalComparer());
 
             PopulateParentCollections();
         }
@@ -105,7 +105,7 @@ namespace comicReader.NET
                 else
                     ParentCollections = Directory.GetDirectories(Path.GetDirectoryName(currentPath)).ToList<string>();
 
-            ParentCollections.Sort(new NaturalComparer(NaturalComparer.NaturalComparerMode.DirectoryNames));
+            ParentCollections.Sort(new NaturalComparer());
         }
 
         public string GetCurrentFileName()

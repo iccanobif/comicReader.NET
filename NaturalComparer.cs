@@ -8,19 +8,6 @@ namespace comicReader.NET
 {
     public class NaturalComparer : IComparer<string>
     {
-        public enum NaturalComparerMode
-        {
-            DirectoryNames,
-            FileNames
-        }
-
-        NaturalComparerMode currentComparerMode;
-
-        public NaturalComparer(NaturalComparerMode mode)
-        {
-            currentComparerMode = mode;
-        }
-
         private bool IsNumber(string s)
         {
             return Regex.IsMatch(s, @"\d");
@@ -42,7 +29,8 @@ namespace comicReader.NET
                                   where !string.IsNullOrWhiteSpace(s) && s != "."
                                   select Regex.Replace(s.ToUpper(), @"[\[\]\(\)\-_ ]", "")).ToArray<string>();
 
-            if (currentComparerMode == NaturalComparerMode.FileNames)
+            if ((ArchiveReader.allowedImageExtensions.IsMatch(s1) || ArchiveReader.allowedArchiveExtensions.IsMatch(s1))
+                && (ArchiveReader.allowedImageExtensions.IsMatch(s2) || ArchiveReader.allowedArchiveExtensions.IsMatch(s2)))
             {
                 //If the strings I'm comparing are filenames (eg. "b\altan_Pagina_018.jpg" and "b\altan_Pagina_018b.jpg") I remove the extension, so that
                 //in the above example 018 comes before 018b (longer names should come after shorter ones)
