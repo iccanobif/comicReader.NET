@@ -390,9 +390,9 @@ namespace comicReader.NET
         private void SetDefaultPosition()
         {
             if (this.Width > resizedBitmap.Width)
-                currentHorizontalPosition = (this.Width - resizedBitmap.Width) / 2;
+                currentHorizontalPosition = (this.ClientSize.Width - resizedBitmap.Width) / 2;
             else
-                currentHorizontalPosition = 0;
+                currentHorizontalPosition = this.ClientSize.Width - resizedBitmap.Width; //TODO: enable the user to choose between comic style and manga style
             currentVerticalPosition = 0;
         }
 
