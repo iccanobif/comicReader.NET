@@ -13,6 +13,8 @@ namespace comicReader.NET
 {
     public partial class FrmMain : Form
     {
+        const int wordWrapLineLenght = 90;
+
         enum DisplayMode
         {
             FitWidth = 0,
@@ -91,6 +93,56 @@ namespace comicReader.NET
             Text = "Comic Reader - " + title;
         }
 
+        private void LoadCurrentFile()
+        {
+            if (!currentArchiveReader.GetCurrentFileName().ToLower().EndsWith(".txt"))
+                originalBitmap = new Bitmap(new System.IO.MemoryStream(currentArchiveReader.GetCurrentFile()));
+            else
+            {
+                //Draw a picture containing the text (with crude word-wrapping).
+                string text = UTF8Encoding.UTF8.GetString(currentArchiveReader.GetCurrentFile());
+                text = text.Replace("\r\n", "\n").Replace("\t", "    ");
+
+                StringBuilder wordWrappedText = new StringBuilder(text.Length + 100);
+                int linesCount = 0;
+
+                foreach (string l in text.Split('\n'))
+                {
+                    int i = 0;
+                    while (i < l.Length)
+                    {
+                        int lenght = i + wordWrapLineLenght > l.Length ? l.Length - i : wordWrapLineLenght;
+                        wordWrappedText.Append(l.Substring(i, lenght) + Environment.NewLine);
+                        i += wordWrapLineLenght;
+                        linesCount++;
+                        if (linesCount > 1000)
+                        {
+                            wordWrappedText.Append("...");
+                            goto fanculo;
+                        }
+                    }
+                }
+
+                fanculo:
+
+                Font f = new Font(FontFamily.GenericMonospace, 10, FontStyle.Bold);
+
+                Graphics tmpGraphics = Graphics.FromImage(new Bitmap(1, 1));
+                int characterWidth = (int)(tmpGraphics.MeasureString("A", f).Width);
+                int width = (int)(tmpGraphics.MeasureString(new String('A', wordWrapLineLenght + 3), f).Width);
+                int height = (int)((linesCount + 2) * (f.GetHeight()));
+
+                originalBitmap = new Bitmap(width, 
+                                            height); 
+
+                Graphics g = Graphics.FromImage(originalBitmap);
+
+                g.FillRectangle(Brushes.White, 0, 0, originalBitmap.Width, originalBitmap.Height);
+                g.DrawString(wordWrappedText.ToString(), f, Brushes.Black, f.GetHeight(), characterWidth);
+            }
+                
+        }
+
         private void FrmMain_KeyDown(object sender, KeyEventArgs e)
         {
             //Commands that make sense even when there's no open comic at the moment
@@ -113,7 +165,7 @@ namespace comicReader.NET
                     try
                     {
                         currentArchiveReader = currentComic.CreateArchiveReader();
-                        originalBitmap = new Bitmap(new System.IO.MemoryStream(currentArchiveReader.GetCurrentFile()));
+                        LoadCurrentFile();
                         ResizeImage();
                         RepaintAll();
                     }
@@ -139,7 +191,7 @@ namespace comicReader.NET
 
                     if (currentComic != null) currentArchiveReader.SetParentComic(currentComic);
 
-                    originalBitmap = new Bitmap(new System.IO.MemoryStream(currentArchiveReader.GetCurrentFile()));
+                    LoadCurrentFile();
                     ResizeImage();
                     RepaintAll();
                     return;
@@ -241,14 +293,16 @@ namespace comicReader.NET
                     if (e.Shift)
                         currentArchiveReader.CurrentPosition = (new Random(DateTime.Now.Millisecond)).Next(currentArchiveReader.FileNames.Count - 1);
 
-                    originalBitmap = new Bitmap(new System.IO.MemoryStream(currentArchiveReader.GetNextFile()));
+                    currentArchiveReader.MoveToNextFile();
+                    LoadCurrentFile();
                     ResizeImage();
                     break;
                 case Keys.PageUp:
                     if (e.Shift)
                         currentArchiveReader.CurrentPosition = (new Random(DateTime.Now.Millisecond)).Next(currentArchiveReader.FileNames.Count - 1);
 
-                    originalBitmap = new Bitmap(new System.IO.MemoryStream(currentArchiveReader.GetPreviousFile()));
+                    currentArchiveReader.MoveToPreviousFile();
+                    LoadCurrentFile();
                     ResizeImage();
                     break;
                 case Keys.Insert:
@@ -257,7 +311,7 @@ namespace comicReader.NET
                     else
                         currentArchiveReader.MoveToNextCollection(ArchiveReader.CollectionMovementDirection.Forward);
 
-                    originalBitmap = new Bitmap(new System.IO.MemoryStream(currentArchiveReader.GetCurrentFile()));
+                    LoadCurrentFile();
                     ResizeImage();
                     break;
                 // LIBRARY STUFF
@@ -292,7 +346,7 @@ namespace comicReader.NET
                         return;
                     }
 
-                    originalBitmap = new Bitmap(new System.IO.MemoryStream(currentArchiveReader.GetCurrentFile()));
+                    LoadCurrentFile();
                     ResizeImage();
                     break;
 
@@ -431,7 +485,7 @@ namespace comicReader.NET
 
             if (currentComic != null) currentArchiveReader.SetParentComic(currentComic);
 
-            originalBitmap = new Bitmap(new System.IO.MemoryStream(currentArchiveReader.GetCurrentFile()));
+            LoadCurrentFile();
             ResizeImage();
             RepaintAll();
         }

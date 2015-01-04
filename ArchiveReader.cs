@@ -19,7 +19,7 @@ namespace comicReader.NET
             Backwards
         }
 
-        public static Regex allowedImageExtensions = new Regex(@"\.(jpg|jpeg|png|gif|bmp)$", RegexOptions.IgnoreCase);
+        public static Regex allowedImageExtensions = new Regex(@"\.(jpg|jpeg|png|gif|bmp|txt)$", RegexOptions.IgnoreCase);
         public static Regex allowedArchiveExtensions = new Regex(@"\.(zip|rar|cbr|cbz|cbt|cba|cb7|7z)$", RegexOptions.IgnoreCase);
 
         Comic parentComic = null; //Can be null
@@ -131,29 +131,25 @@ namespace comicReader.NET
             Debug.Print("File extraction time: " + DateTime.Now.Subtract(start).ToString());
             return output;
         }
-
-        public byte[] GetNextFile()
+        
+        public void MoveToNextFile()
         {
             CurrentPosition++;
             if (CurrentPosition >= FileNames.Count)
                 CurrentPosition = 0;
 
-            if (parentComic != null) 
+            if (parentComic != null)
                 parentComic.Position = CurrentPosition;
-
-            return GetCurrentFile();
         }
 
-        public byte[] GetPreviousFile()
+        public void MoveToPreviousFile()
         {
             CurrentPosition--;
             if (CurrentPosition < 0)
                 CurrentPosition = FileNames.Count - 1;
 
-            if (parentComic != null) 
+            if (parentComic != null)
                 parentComic.Position = CurrentPosition;
-
-            return GetCurrentFile();
         }
 
         public void MoveToNextCollection(CollectionMovementDirection direction)
