@@ -123,7 +123,7 @@ namespace comicReader.NET
                     }
                 }
 
-                fanculo:
+            fanculo:
 
                 Font f = new Font(FontFamily.GenericMonospace, 10, FontStyle.Bold);
 
@@ -132,15 +132,14 @@ namespace comicReader.NET
                 int width = (int)(tmpGraphics.MeasureString(new String('A', wordWrapLineLenght + 3), f).Width);
                 int height = (int)((linesCount + 2) * (f.GetHeight()));
 
-                originalBitmap = new Bitmap(width, 
-                                            height); 
+                originalBitmap = new Bitmap(width, height);
 
                 Graphics g = Graphics.FromImage(originalBitmap);
 
                 g.FillRectangle(Brushes.White, 0, 0, originalBitmap.Width, originalBitmap.Height);
                 g.DrawString(wordWrappedText.ToString(), f, Brushes.Black, f.GetHeight(), characterWidth);
             }
-                
+
         }
 
         private void FrmMain_KeyDown(object sender, KeyEventArgs e)
@@ -357,13 +356,11 @@ namespace comicReader.NET
             RepaintAll();
         }
 
-        private void UpdateComic()
-        {
-
-        }
-
         private void FrmMain_MouseWheel(object sender, MouseEventArgs e)
         {
+            if (currentArchiveReader == null)
+                return;
+
             int maxVerticalOffset = ClientSize.Height - resizedBitmap.Height;
 
             if (e.Delta < 0)
@@ -380,6 +377,38 @@ namespace comicReader.NET
             RepaintAll();
 
         }
+
+        protected override void WndProc(ref Message m)
+        {
+            base.WndProc(ref m);
+
+            if (m.Msg != 0x020E) return; //WM_MOUSEHWHEEL
+            if (this.IsDisposed) return;
+            if (m.HWnd != this.Handle) return;
+
+            int delta = m.WParam.ToInt64() < 0 ? 100 : -100;
+
+            if (currentArchiveReader == null)
+                return;
+
+            int maxHorizontalOffset = ClientSize.Width - resizedBitmap.Width;
+
+            if (delta < 0)
+            {
+                currentHorizontalPosition -= 100;
+                if (currentHorizontalPosition <= maxHorizontalOffset) currentHorizontalPosition = maxHorizontalOffset;
+            }
+            else
+            {
+                currentHorizontalPosition += 100;
+                if (currentHorizontalPosition > 0) currentHorizontalPosition = 0;
+            }
+
+            RepaintAll();
+
+            m.Result = (IntPtr)1;
+        }
+
 
         private void RepaintAll()
         {
@@ -495,6 +524,7 @@ namespace comicReader.NET
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
                 e.Effect = DragDropEffects.Copy;
         }
+
 
     }
 }
