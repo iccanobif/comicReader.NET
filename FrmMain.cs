@@ -100,7 +100,13 @@ namespace comicReader.NET
             else
             {
                 //Draw a picture containing the text (with crude word-wrapping).
-                string text = UTF8Encoding.UTF8.GetString(currentArchiveReader.GetCurrentFile());
+                
+                //Rather quick and dirty way to detect the character encoding: I assume that the shortest result between UTF8 and SHIFT-JIS is the correct one
+                string textUTF8 = UTF8Encoding.UTF8.GetString(currentArchiveReader.GetCurrentFile());
+                string textSJIS = Encoding.GetEncoding("shift_jis").GetString(currentArchiveReader.GetCurrentFile());
+
+                string text = textUTF8.Length < textSJIS.Length ? textUTF8 : textSJIS; 
+
                 text = text.Replace("\r\n", "\n").Replace("\t", "    ");
 
                 StringBuilder wordWrappedText = new StringBuilder(text.Length + 100);
