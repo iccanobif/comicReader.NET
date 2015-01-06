@@ -101,7 +101,7 @@ namespace comicReader.NET
             {
                 //Draw a picture containing the text (with crude word-wrapping).
                 
-                //Rather quick and dirty way to detect the character encoding: I assume that the shortest result between UTF8 and SHIFT-JIS is the correct one
+                //Rather quick and dirty (and wrong) way to detect the character encoding: I assume that the shortest result between UTF8 and SHIFT-JIS is the correct one
                 string textUTF8 = UTF8Encoding.UTF8.GetString(currentArchiveReader.GetCurrentFile());
                 string textSJIS = Encoding.GetEncoding("shift_jis").GetString(currentArchiveReader.GetCurrentFile());
 
@@ -367,6 +367,8 @@ namespace comicReader.NET
             if (currentArchiveReader == null)
                 return;
 
+            if (resizedBitmap.Height <= ClientSize.Height) return;
+
             int maxVerticalOffset = ClientSize.Height - resizedBitmap.Height;
 
             if (e.Delta < 0)
@@ -392,10 +394,11 @@ namespace comicReader.NET
             if (this.IsDisposed) return;
             if (m.HWnd != this.Handle) return;
 
+
             int delta = m.WParam.ToInt64() < 0 ? 100 : -100;
 
-            if (currentArchiveReader == null)
-                return;
+            if (currentArchiveReader == null) return;
+            if (resizedBitmap.Width <= ClientSize.Width) return;
 
             int maxHorizontalOffset = ClientSize.Width - resizedBitmap.Width;
 
