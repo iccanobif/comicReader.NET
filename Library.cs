@@ -20,7 +20,14 @@ namespace comicReader.NET
         {
             using (SQLiteCommand cmd = conn.CreateCommand())
             {
-                cmd.CommandText = "CREATE TABLE IF NOT EXISTS COMICS (GBL_ID, PATH, TITLE, POSITION, CREATION_DATE, LAST_EDIT_DATE)";
+                cmd.CommandText = @"CREATE TABLE IF NOT EXISTS COMICS (
+                                        GBL_ID, 
+                                        PATH, 
+                                        TITLE, 
+                                        POSITION, 
+                                        CREATION_DATE, 
+                                        LAST_EDIT_DATE,
+                                        ZOOM)";
                 cmd.ExecuteNonQuery();
 
                 /*
@@ -30,7 +37,15 @@ namespace comicReader.NET
                  * U: Update
                  */
 
-                cmd.CommandText = "CREATE TABLE IF NOT EXISTS COMICS_LOG (GBL_ID, PATH, TITLE, POSITION, CREATION_DATE, OPERATION_TYPE, OPERATION_DATE)";
+                cmd.CommandText = @"CREATE TABLE IF NOT EXISTS COMICS_LOG (
+                                        GBL_ID, 
+                                        PATH, 
+                                        TITLE, 
+                                        POSITION, 
+                                        CREATION_DATE, 
+                                        OPERATION_TYPE, 
+                                        OPERATION_DATE, 
+                                        ZOOM)";
                 cmd.ExecuteNonQuery();
             }
         }
@@ -65,22 +80,50 @@ namespace comicReader.NET
 
                     if (count == 0)
                     {
-                        cmd.CommandText = @"INSERT INTO COMICS (GBL_ID, PATH, TITLE, POSITION, CREATION_DATE, LAST_EDIT_DATE) 
-                                                        VALUES (@gbl_id, @path, @title, @position, @creation_date, @creation_date)";
+                        cmd.CommandText = @"INSERT INTO COMICS (GBL_ID, 
+                                                                PATH, 
+                                                                TITLE, 
+                                                                POSITION, 
+                                                                CREATION_DATE, 
+                                                                LAST_EDIT_DATE,
+                                                                ZOOM) 
+                                                        VALUES (@gbl_id, 
+                                                                @path, 
+                                                                @title, 
+                                                                @position, 
+                                                                @creation_date, 
+                                                                @creation_date,
+                                                                @zoom)";
 
                         cmd.Parameters.AddWithValue("@creation_date", DateTime.Now);
                     }
                     else
                         //TODO: don't insert a new log if the most recent one points to the same path
-                        cmd.CommandText = @"INSERT INTO COMICS_LOG (GBL_ID, PATH, TITLE, POSITION, CREATION_DATE, OPERATION_TYPE, OPERATION_DATE)
-                                            SELECT GBL_ID, PATH, TITLE, POSITION, CREATION_DATE, 'U', @operation_date
+                        cmd.CommandText = @"INSERT INTO COMICS_LOG (
+                                                   GBL_ID, 
+                                                   PATH, 
+                                                   TITLE, 
+                                                   POSITION, 
+                                                   CREATION_DATE, 
+                                                   OPERATION_TYPE, 
+                                                   OPERATION_DATE, 
+                                                   ZOOM)
+                                            SELECT GBL_ID, 
+                                                   PATH, 
+                                                   TITLE, 
+                                                   POSITION, 
+                                                   CREATION_DATE, 
+                                                   'U', 
+                                                   @operation_date,
+                                                   ZOOM
                                             FROM COMICS WHERE GBL_ID = @gbl_id;
 
                                              UPDATE COMICS 
                                                 SET PATH = @path, 
                                                     TITLE = @title, 
                                                     POSITION = @position,
-                                                    LAST_EDIT_DATE = @operation_date
+                                                    LAST_EDIT_DATE = @operation_date,
+                                                    ZOOM = @zoom
                                                 WHERE GBL_ID = @gbl_id";
 
                     cmd.Parameters.AddWithValue("@operation_date", DateTime.Now);
@@ -88,6 +131,7 @@ namespace comicReader.NET
                     cmd.Parameters.AddWithValue("@title", c.Title);
                     cmd.Parameters.AddWithValue("@gbl_id", c.Id);
                     cmd.Parameters.AddWithValue("@position", c.Position);
+                    cmd.Parameters.AddWithValue("@zoom", c.Zoom);
                     cmd.ExecuteNonQuery();
                 }
 
@@ -104,9 +148,25 @@ namespace comicReader.NET
                 {
                     cmd.Transaction = trans;
 
-                    cmd.CommandText = @"INSERT INTO COMICS_LOG (GBL_ID, PATH, TITLE, POSITION, CREATION_DATE, OPERATION_TYPE, OPERATION_DATE)
-                                        SELECT GBL_ID, PATH, TITLE, POSITION, CREATION_DATE, 'D', @operation_date
-                                        FROM COMICS WHERE GBL_ID = @gbl_id; ";
+                    cmd.CommandText = @"INSERT INTO COMICS_LOG (
+                                                    GBL_ID, 
+                                                    PATH, 
+                                                    TITLE, 
+                                                    POSITION, 
+                                                    CREATION_DATE, 
+                                                    OPERATION_TYPE, 
+                                                    OPERATION_DATE,
+                                                    ZOOM)
+                                                SELECT GBL_ID, 
+                                                    PATH, 
+                                                    TITLE, 
+                                                    POSITION, 
+                                                    CREATION_DATE, 
+                                                    'D', 
+                                                    @operation_date, 
+                                                    ZOOM
+                                                FROM COMICS 
+                                                WHERE GBL_ID = @gbl_id; ";
                     cmd.Parameters.AddWithValue("@gbl_id", id);
                     cmd.Parameters.AddWithValue("@operation_date", DateTime.Now);
 
@@ -134,7 +194,8 @@ namespace comicReader.NET
                                            C.PATH, 
                                            C.TITLE, 
                                            C.CREATION_DATE,
-                                           LAST_EDIT_DATE
+                                           LAST_EDIT_DATE,
+                                           ZOOM
                                       FROM COMICS C
                                   ORDER BY LAST_EDIT_DATE DESC, C.CREATION_DATE, UPPER(C.TITLE)";
                 SQLiteDataReader reader = cmd.ExecuteReader();
@@ -148,6 +209,7 @@ namespace comicReader.NET
                     c.Path = reader["PATH"].ToString();
                     c.Title = reader["TITLE"].ToString();
                     c.CreationDate = Convert.ToDateTime(reader["CREATION_DATE"]);
+                    c.Zoom = Convert.ToDouble(reader["ZOOM"]);
                     output.Add(c);
                 }
 
@@ -160,11 +222,18 @@ namespace comicReader.NET
         {
         }
 
+        //TODO: maybe it'd be better to delete this method and add a comicId filter to GetComics instead?
+        //having two different methods that both populate Comic objects but not every property is pretty terrible...
         public Comic GetComic(string id)
         {
             using (SQLiteCommand cmd = conn.CreateCommand())
             {
-                cmd.CommandText = "SELECT PATH, TITLE, POSITION FROM COMICS WHERE GBL_ID = @id";
+                cmd.CommandText = @"SELECT PATH, 
+                                           TITLE, 
+                                           POSITION, 
+                                           ZOOM 
+                                      FROM COMICS 
+                                     WHERE GBL_ID = @id";
                 cmd.Parameters.AddWithValue("@id", id);
                 SQLiteDataReader reader = cmd.ExecuteReader();
                 if (!reader.HasRows)
@@ -178,6 +247,7 @@ namespace comicReader.NET
                 c.Path = reader["PATH"].ToString();
                 c.Title = reader["TITLE"].ToString();
                 c.Position = Convert.ToInt32(reader["POSITION"]);
+                c.Zoom = Convert.ToDouble(reader["ZOOM"]);
 
                 return c;
             }

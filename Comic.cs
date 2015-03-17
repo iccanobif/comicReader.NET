@@ -12,10 +12,12 @@ namespace comicReader.NET
         public int Position { get; set; }
         public string Id { get; set; }
         public DateTime CreationDate { get; set; }
+        public double Zoom { get; set; }
 
         public Comic()
         {
             Id = Guid.NewGuid().ToString();
+            Zoom = 1;
         }
 
         public ArchiveReader CreateArchiveReader()
