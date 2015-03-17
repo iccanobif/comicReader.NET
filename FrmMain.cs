@@ -25,7 +25,6 @@ namespace comicReader.NET
         DisplayMode currentDisplayMode = DisplayMode.Zoom;
         Bitmap originalBitmap;
         Bitmap resizedBitmap;
-        double zoom = 1;
         int currentVerticalPosition = 0;
         int currentHorizontalPosition = 0;
         ArchiveReader currentArchiveReader;
@@ -40,17 +39,14 @@ namespace comicReader.NET
         {
             InitializeComponent();
 
-            //currentComic = new Comic();
-            //currentComic.path = @"f:\mieiProgrammi\comicReader.NET\testImages\arthur";
-
-            //archiveReader = new ArchiveReader(currentComic.path);
+            currentComic = new Comic();
         }
 
         public void ResizeImage()
         {
             DateTime start = DateTime.Now;
 
-            resizedBitmap = new Bitmap((int)(originalBitmap.Width * zoom), (int)(originalBitmap.Height * zoom));
+            resizedBitmap = new Bitmap((int)(originalBitmap.Width * currentComic.Zoom), (int)(originalBitmap.Height * currentComic.Zoom));
 
             using (Graphics graphics = Graphics.FromImage(resizedBitmap))
             {
@@ -77,7 +73,6 @@ namespace comicReader.NET
             Debug.Print("Resizing time: " + DateTime.Now.Subtract(start).ToString());
 
             SetWindowTitle(string.Format("{0} - {1}{2}",
-                //currentComic != null ? currentComic.Title : System.IO.Path.GetFileName(currentArchiveReader.CurrentPath), 
                                          System.IO.Path.GetFileName(currentArchiveReader.CurrentPath),
                                          currentArchiveReader.GetCurrentFileName(),
                                          currentArchiveReader.CurrentPosition == currentArchiveReader.FileNames.Count - 1 ? " [END]" : string.Empty
@@ -160,7 +155,7 @@ namespace comicReader.NET
                     // Open library window
                     FrmLibrary libraryDialog = new FrmLibrary(currentLibrary,
                                                               currentArchiveReader == null ? null : currentArchiveReader.CurrentPath,
-                                                              currentComic == null ? null : currentComic.Id);
+                                                              currentComic.Id);
 
                     Comic newComic = libraryDialog.GetComic();
 
@@ -194,7 +189,7 @@ namespace comicReader.NET
 
                     if (currentArchiveReader == null) return;
 
-                    if (currentComic != null) currentArchiveReader.SetParentComic(currentComic);
+                    currentArchiveReader.SetParentComic(currentComic);
 
                     LoadCurrentFile();
                     ResizeImage();
@@ -213,11 +208,11 @@ namespace comicReader.NET
             {
                 // ZOOM KEYS
                 case Keys.Add:
-                    zoom = zoom * 1.1;
+                    currentComic.Zoom *= 1.1;
                     ResizeImage();
                     break;
                 case Keys.Subtract:
-                    zoom = zoom * 0.9;
+                    currentComic.Zoom *= 0.9;
                     ResizeImage();
                     break;
                 //ARROW KEYS
@@ -321,13 +316,13 @@ namespace comicReader.NET
                     break;
                 // LIBRARY STUFF
                 case Keys.S:
-                    if (currentComic == null) return;
+                    if (!currentComic.Saved) return; //TODO: could open a popup for adding this new comic to the library, instead
 
                     currentLibrary.SaveComic(currentComic);
                     osdText = "SAVED";
                     break;
                 case Keys.C:
-                    if (currentComic == null) return;
+                    if (!currentComic.Saved) return;
 
                     try
                     {

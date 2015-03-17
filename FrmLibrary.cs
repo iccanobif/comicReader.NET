@@ -32,7 +32,7 @@ namespace comicReader.NET
             if (defaultPath != null)
                 TxtPath.Text = defaultPath;
 
-            if (defaultComicId != null)
+            if (comicList.FirstOrDefault(c => c.Id == defaultComicId) != null)
                 LstComics.SelectedValue = defaultComicId;
         }
 

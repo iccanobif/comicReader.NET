@@ -13,15 +13,21 @@ namespace comicReader.NET
         public string Id { get; set; }
         public DateTime CreationDate { get; set; }
         public double Zoom { get; set; }
+        //TODO: Saved is public. figure out a better way...
+        public bool Saved { get; set; }
 
         public Comic()
         {
             Id = Guid.NewGuid().ToString();
             Zoom = 1;
+            Saved = false;
         }
 
         public ArchiveReader CreateArchiveReader()
         {
+            if (string.IsNullOrEmpty(Path))
+                return null;
+
             ArchiveReader output = new ArchiveReader(Path, this);
             output.CurrentPosition = Position;
 

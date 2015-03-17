@@ -248,6 +248,7 @@ namespace comicReader.NET
                 c.Title = reader["TITLE"].ToString();
                 c.Position = Convert.ToInt32(reader["POSITION"]);
                 c.Zoom = Convert.ToDouble(reader["ZOOM"]);
+                c.Saved = true;
 
                 return c;
             }

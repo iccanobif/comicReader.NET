@@ -65,13 +65,13 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Shadow Include="Test References\comicReader.NET.accessor" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\comicReader.NET.csproj">
       <Project>{56707418-0209-4679-B04D-6661F641EC0D}</Project>
       <Name>comicReader.NET</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Test References\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
