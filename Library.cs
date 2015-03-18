@@ -186,7 +186,7 @@ namespace comicReader.NET
             }
         }
 
-        public List<Comic> GetComicList()
+        public List<Comic> GetComicList(string id = null)
         {
             using (SQLiteCommand cmd = conn.CreateCommand())
             {
@@ -194,10 +194,17 @@ namespace comicReader.NET
                                            C.PATH, 
                                            C.TITLE, 
                                            C.CREATION_DATE,
-                                           LAST_EDIT_DATE,
-                                           ZOOM
+                                           C.LAST_EDIT_DATE,
+                                           C.ZOOM,
+                                           C.POSITION
                                       FROM COMICS C
+                                     WHERE GBL_ID = IFNULL(@id, GBL_ID)
                                   ORDER BY LAST_EDIT_DATE DESC, C.CREATION_DATE, UPPER(C.TITLE)";
+                if (string.IsNullOrEmpty(id))
+                    cmd.Parameters.AddWithValue("@id", DBNull.Value);
+                else
+                    cmd.Parameters.AddWithValue("@id", id);
+
                 SQLiteDataReader reader = cmd.ExecuteReader();
 
                 List<Comic> output = new List<Comic>();
@@ -208,8 +215,10 @@ namespace comicReader.NET
                     c.Id = reader["GBL_ID"].ToString();
                     c.Path = reader["PATH"].ToString();
                     c.Title = reader["TITLE"].ToString();
+                    c.Position = Convert.ToInt32(reader["POSITION"]);
                     c.CreationDate = Convert.ToDateTime(reader["CREATION_DATE"]);
                     c.Zoom = Convert.ToDouble(reader["ZOOM"]);
+                    c.Saved = true;
                     output.Add(c);
                 }
 
@@ -222,38 +231,12 @@ namespace comicReader.NET
         {
         }
 
-        //TODO: maybe it'd be better to delete this method and add a comicId filter to GetComics instead?
-        //having two different methods that both populate Comic objects but not every property is pretty terrible...
         public Comic GetComic(string id)
         {
-            using (SQLiteCommand cmd = conn.CreateCommand())
-            {
-                cmd.CommandText = @"SELECT PATH, 
-                                           TITLE, 
-                                           POSITION, 
-                                           ZOOM 
-                                      FROM COMICS 
-                                     WHERE GBL_ID = @id";
-                cmd.Parameters.AddWithValue("@id", id);
-                SQLiteDataReader reader = cmd.ExecuteReader();
-                if (!reader.HasRows)
-                {
-                    throw new NotExistingComicException();
-                }
-
-                Comic c = new Comic();
-                reader.Read();
-                c.Id = id;
-                c.Path = reader["PATH"].ToString();
-                c.Title = reader["TITLE"].ToString();
-                c.Position = Convert.ToInt32(reader["POSITION"]);
-                c.Zoom = Convert.ToDouble(reader["ZOOM"]);
-                c.Saved = true;
-
-                return c;
-            }
+            List<Comic> l = GetComicList(id);
+            if (l.Count == 0)
+                throw new NotExistingComicException();
+            return l[0];
         }
-
-
     }
 }
