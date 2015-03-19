@@ -88,59 +88,73 @@ namespace comicReader.NET
             Text = "Comic Reader - " + title;
         }
 
-        private void LoadCurrentFile()
+        /// <summary>
+        /// Draw a picture containing the text (with crude word-wrapping).
+        /// </summary>
+        private Bitmap DrawTextToBitmap(string text)
         {
-            if (!currentArchiveReader.GetCurrentFileName().ToLower().EndsWith(".txt"))
-                originalBitmap = new Bitmap(new System.IO.MemoryStream(currentArchiveReader.GetCurrentFile()));
-            else
+            text = text.Replace("\r\n", "\n").Replace("\t", "    ");
+
+            StringBuilder wordWrappedText = new StringBuilder(text.Length + 100);
+            int linesCount = 0;
+
+            foreach (string l in text.Split('\n'))
             {
-                //Draw a picture containing the text (with crude word-wrapping).
-                
-                //Rather quick and dirty (and wrong) way to detect the character encoding: I assume that the shortest result between UTF8 and SHIFT-JIS is the correct one
-                string textUTF8 = UTF8Encoding.UTF8.GetString(currentArchiveReader.GetCurrentFile());
-                string textSJIS = Encoding.GetEncoding("shift_jis").GetString(currentArchiveReader.GetCurrentFile());
-
-                string text = textUTF8.Length < textSJIS.Length ? textUTF8 : textSJIS; 
-
-                text = text.Replace("\r\n", "\n").Replace("\t", "    ");
-
-                StringBuilder wordWrappedText = new StringBuilder(text.Length + 100);
-                int linesCount = 0;
-
-                foreach (string l in text.Split('\n'))
+                int i = 0;
+                while (i < l.Length)
                 {
-                    int i = 0;
-                    while (i < l.Length)
+                    int lenght = i + wordWrapLineLenght > l.Length ? l.Length - i : wordWrapLineLenght;
+                    wordWrappedText.Append(l.Substring(i, lenght) + Environment.NewLine);
+                    i += wordWrapLineLenght;
+                    linesCount++;
+                    if (linesCount > 1000)
                     {
-                        int lenght = i + wordWrapLineLenght > l.Length ? l.Length - i : wordWrapLineLenght;
-                        wordWrappedText.Append(l.Substring(i, lenght) + Environment.NewLine);
-                        i += wordWrapLineLenght;
-                        linesCount++;
-                        if (linesCount > 1000)
-                        {
-                            wordWrappedText.Append("...");
-                            goto fanculo;
-                        }
+                        wordWrappedText.Append("...");
+                        goto doneWithReading;
                     }
                 }
-
-            fanculo:
-
-                Font f = new Font(FontFamily.GenericMonospace, 10, FontStyle.Bold);
-
-                Graphics tmpGraphics = Graphics.FromImage(new Bitmap(1, 1));
-                int characterWidth = (int)(tmpGraphics.MeasureString("A", f).Width);
-                int width = (int)(tmpGraphics.MeasureString(new String('A', wordWrapLineLenght + 3), f).Width);
-                int height = (int)((linesCount + 2) * (f.GetHeight()));
-
-                originalBitmap = new Bitmap(width, height);
-
-                Graphics g = Graphics.FromImage(originalBitmap);
-
-                g.FillRectangle(Brushes.White, 0, 0, originalBitmap.Width, originalBitmap.Height);
-                g.DrawString(wordWrappedText.ToString(), f, Brushes.Black, f.GetHeight(), characterWidth);
             }
 
+        doneWithReading:
+
+            Font f = new Font(FontFamily.GenericMonospace, 10, FontStyle.Bold);
+
+            Graphics tmpGraphics = Graphics.FromImage(new Bitmap(1, 1));
+            int characterWidth = (int)(tmpGraphics.MeasureString("A", f).Width);
+            int width = (int)(tmpGraphics.MeasureString(new String('A', wordWrapLineLenght + 3), f).Width);
+            int height = (int)((linesCount + 2) * (f.GetHeight()));
+
+            Bitmap output = new Bitmap(width, height);
+
+            Graphics g = Graphics.FromImage(output);
+
+            g.FillRectangle(Brushes.White, 0, 0, output.Width, output.Height);
+            g.DrawString(wordWrappedText.ToString(), f, Brushes.Black, f.GetHeight(), characterWidth);
+
+            return output;
+        }
+
+        private void LoadCurrentFile()
+        {
+            try
+            {
+                if (!currentArchiveReader.GetCurrentFileName().ToLower().EndsWith(".txt"))
+                    originalBitmap = new Bitmap(new System.IO.MemoryStream(currentArchiveReader.GetCurrentFile()));
+                else
+                {
+                    //Rather quick and dirty (and wrong) way to detect the character encoding: I assume that the shortest result between UTF8 and SHIFT-JIS is the correct one
+                    string textUTF8 = UTF8Encoding.UTF8.GetString(currentArchiveReader.GetCurrentFile());
+                    string textSJIS = Encoding.GetEncoding("shift_jis").GetString(currentArchiveReader.GetCurrentFile());
+
+                    string text = textUTF8.Length < textSJIS.Length ? textUTF8 : textSJIS;
+
+                    originalBitmap = DrawTextToBitmap(text);
+                }
+            }
+            catch (Exception e)
+            {
+                originalBitmap = DrawTextToBitmap(e.Message + "\n" + e.StackTrace);
+            }
         }
 
         private void FrmMain_KeyDown(object sender, KeyEventArgs e)
