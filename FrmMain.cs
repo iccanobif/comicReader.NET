@@ -159,6 +159,10 @@ namespace comicReader.NET
 
         private void FrmMain_KeyDown(object sender, KeyEventArgs e)
         {
+            DateTime keyPressTime = DateTime.Now;
+            Debug.Print("Key pressed");
+
+
             //Commands that make sense even when there's no open comic at the moment
             switch (e.KeyCode)
             {
@@ -369,6 +373,8 @@ namespace comicReader.NET
             }
 
             RepaintAll();
+
+            Debug.Print("Key handling over: " + DateTime.Now.Subtract(keyPressTime).ToString());
         }
 
         private void FrmMain_MouseWheel(object sender, MouseEventArgs e)

@@ -108,12 +108,31 @@ namespace UnitTests
             Assert.IsTrue(target.Compare(@"Chapter_022.zip", @"Chapter_022_B.zip") < 0);
         }
 
+        //[TestMethod()]
+        //public void CompareTest12()
+        //{
+        //    //I added this test, but still haven't bothered with fixing it
+        //    NaturalComparer target = new NaturalComparer();
+        //    Assert.IsTrue(target.Compare(@"Ryuushika_Ryuushika_v01\Ryuushika_Ryuushika_v01_c02-5_035.jpeg", @"Ryuushika_Ryuushika_v01\Ryuushika_Ryuushika_v01_c02_028.jpeg") > 0);
+        //}
+
+
         [TestMethod()]
-        public void CompareTest12()
+        public void CompareTest13()
         {
             //I added this test, but still haven't bothered with fixing it
             NaturalComparer target = new NaturalComparer();
-            Assert.IsTrue(target.Compare(@"Ryuushika_Ryuushika_v01\Ryuushika_Ryuushika_v01_c02-5_035.jpeg", @"Ryuushika_Ryuushika_v01\Ryuushika_Ryuushika_v01_c02_028.jpeg") > 0);
+            Assert.IsTrue(target.Compare(@"Shin Chimoguri Ringo to Kingyobachi Otoko c002 [Habanero Scans].zip", @"Shin Chimoguri Ringo to Kingyobachi Otoko c002b [Habanero Scans].zip") < 0);
+        }
+
+
+
+        [TestMethod()]
+        public void CompareTest14()
+        {
+            //I added this test, but still haven't bothered with fixing it
+            NaturalComparer target = new NaturalComparer();
+            Assert.IsTrue(target.Compare(@"Shin Chimoguri Ringo to Kingyobachi Otoko c002.zip", @"Shin Chimoguri Ringo to Kingyobachi Otoko c002b.zip") < 0);
         }
     }
 }

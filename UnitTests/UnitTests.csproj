@@ -63,6 +63,7 @@
   <ItemGroup>
     <Compile Include="NaturalComparerTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="NumberComparerTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\comicReader.NET.csproj">

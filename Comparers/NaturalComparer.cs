@@ -23,12 +23,13 @@ namespace comicReader.NET
             string[] splitted1 = (from s in Regex.Split(s1, @"([0-9]+|\.)") //split by groups of numeric characters and periods
                                   where !string.IsNullOrWhiteSpace(s) && s != "." //the idea here is to ignore spaces and periods, so that, for example, xxx15xx < xx15.5xx where x's are non numeric characters
                                   select Regex.Replace(s.ToUpper(), @"[\[\]\(\)\-_ ]", "") //clean characters i'd rather ignore in the comparison (whitespace, dashes, underscores...)
-                                  ).ToArray<string>(); 
+                                  ).ToArray<string>();
 
             string[] splitted2 = (from s in Regex.Split(s2, @"([0-9]+|\.)")
                                   where !string.IsNullOrWhiteSpace(s) && s != "."
-                                  select Regex.Replace(s.ToUpper(), @"[\[\]\(\)\-_ ]", "")).ToArray<string>();
-
+                                  select Regex.Replace(s.ToUpper(), @"[\[\]\(\)\-_ ]", "")
+                                  ).ToArray<string>();
+            
             if ((ArchiveReader.allowedImageExtensions.IsMatch(s1) || ArchiveReader.allowedArchiveExtensions.IsMatch(s1))
                 && (ArchiveReader.allowedImageExtensions.IsMatch(s2) || ArchiveReader.allowedArchiveExtensions.IsMatch(s2)))
             {
@@ -68,7 +69,11 @@ namespace comicReader.NET
 
                     int compareResult = splitted1[i].CompareTo(splitted2[i]);
                     if (compareResult != 0)
+                    {
+                        //if (splitted1[i].EndsWith(splitted2[i])) return -1;
+                        //if (splitted2[i].EndsWith(splitted1[i])) return 1;
                         return compareResult;
+                    }
                 }
 
                 i++;

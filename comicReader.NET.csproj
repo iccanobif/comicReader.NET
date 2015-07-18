@@ -69,7 +69,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArchiveReader.cs" />
-    <Compile Include="NaturalComparer.cs" />
+    <Compile Include="Comparers\NaturalComparer.cs" />
+    <Compile Include="Comparers\NumberComparer.cs" />
     <Compile Include="FrmFileSystemNavigation.cs">
       <SubType>Form</SubType>
     </Compile>
