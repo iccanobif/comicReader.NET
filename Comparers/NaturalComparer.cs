@@ -21,15 +21,15 @@ namespace comicReader.NET
         public int Compare(string s1, string s2)
         {
             string[] splitted1 = (from s in Regex.Split(s1, @"([0-9]+|\.)") //split by groups of numeric characters and periods
-                                  where !string.IsNullOrWhiteSpace(s) && s != "." //the idea here is to ignore spaces and periods, so that, for example, xxx15xx < xx15.5xx where x's are non numeric characters
+                                  where !string.IsNullOrWhiteSpace(Regex.Replace(s.ToUpper(), @"[\[\]\(\)\-_ ]", "")) && s != "." //the idea here is to ignore spaces and periods, so that, for example, xxx15xx < xx15.5xx where x's are non numeric characters
                                   select Regex.Replace(s.ToUpper(), @"[\[\]\(\)\-_ ]", "") //clean characters i'd rather ignore in the comparison (whitespace, dashes, underscores...)
                                   ).ToArray<string>();
 
             string[] splitted2 = (from s in Regex.Split(s2, @"([0-9]+|\.)")
-                                  where !string.IsNullOrWhiteSpace(s) && s != "."
+                                  where !string.IsNullOrWhiteSpace(Regex.Replace(s.ToUpper(), @"[\[\]\(\)\-_ ]", "")) && s != "."
                                   select Regex.Replace(s.ToUpper(), @"[\[\]\(\)\-_ ]", "")
                                   ).ToArray<string>();
-            
+
             if ((ArchiveReader.allowedImageExtensions.IsMatch(s1) || ArchiveReader.allowedArchiveExtensions.IsMatch(s1))
                 && (ArchiveReader.allowedImageExtensions.IsMatch(s2) || ArchiveReader.allowedArchiveExtensions.IsMatch(s2)))
             {

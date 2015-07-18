@@ -119,7 +119,6 @@ namespace UnitTests
         [TestMethod()]
         public void CompareTest13()
         {
-            //I added this test, but still haven't bothered with fixing it
             NaturalComparer target = new NaturalComparer();
             Assert.IsTrue(target.Compare(@"Shin Chimoguri Ringo to Kingyobachi Otoko c002 [Habanero Scans].zip", @"Shin Chimoguri Ringo to Kingyobachi Otoko c002b [Habanero Scans].zip") < 0);
         }
@@ -129,9 +128,18 @@ namespace UnitTests
         [TestMethod()]
         public void CompareTest14()
         {
-            //I added this test, but still haven't bothered with fixing it
             NaturalComparer target = new NaturalComparer();
             Assert.IsTrue(target.Compare(@"Shin Chimoguri Ringo to Kingyobachi Otoko c002.zip", @"Shin Chimoguri Ringo to Kingyobachi Otoko c002b.zip") < 0);
+        }
+
+
+
+        [TestMethod()]
+        public void CompareTest15()
+        {
+            NaturalComparer target = new NaturalComparer();
+            Assert.IsTrue(target.Compare(@"Chimoguri_Ringo_to_Kingyobachi_Otoko_v01_c01_[Maigo]\Chimoguri_Ringo_c01_17.png", 
+                                            @"Chimoguri_Ringo_to_Kingyobachi_Otoko_v01_c01_[Maigo]\Chimoguri_Ringo_c01_29.png") < 0);
         }
     }
 }
