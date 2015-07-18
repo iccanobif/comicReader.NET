@@ -43,7 +43,7 @@ namespace comicReader.NET
             }
 
             int i = 0;
-            while (i < (splitted1.Length < splitted2.Length ? splitted1.Length : splitted2.Length))
+            while (i < (splitted1.Length < splitted2.Length ? splitted1.Length : splitted2.Length) && splitted1[i] != string.Empty )
             {
                 if (IsNumber(splitted1[i]) && IsNumber(splitted2[i]))
                 {
@@ -70,8 +70,8 @@ namespace comicReader.NET
                     int compareResult = splitted1[i].CompareTo(splitted2[i]);
                     if (compareResult != 0)
                     {
-                        //if (splitted1[i].EndsWith(splitted2[i])) return -1;
-                        //if (splitted2[i].EndsWith(splitted1[i])) return 1;
+                        if (splitted1[i].EndsWith(splitted2[i])) return 1;
+                        if (splitted2[i].EndsWith(splitted1[i])) return -1;
                         return compareResult;
                     }
                 }
