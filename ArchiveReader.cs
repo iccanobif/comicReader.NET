@@ -47,7 +47,7 @@ namespace comicReader.NET
                 CurrentPosition = parentComic.Position;
         }
 
-        public void SetParentComic(Comic parentComic) 
+        public void SetParentComic(Comic parentComic)
         {
             //This sucks, maybe Comic and ArchiveReader should have been a single class. ArchiveReader is too dependent on Comic, whenever i change something in an ArchiveReader,
             //i have to change it in the Comic too.
@@ -59,6 +59,29 @@ namespace comicReader.NET
             parentComic.Position = CurrentPosition;
         }
 
+        private List<string> GetFullFileList(SevenZipExtractor e)
+        {
+            List<string> output = new List<string>();
+            foreach (string f in e.ArchiveFileNames)
+            {
+                if (!allowedArchiveExtensions.IsMatch(f))
+                    output.Add(f);
+                else
+                {
+                    MemoryStream str = new MemoryStream();
+                    e.ExtractFile(f, str);
+                    SevenZipExtractor innerEx = new SevenZipExtractor(str);
+
+                    foreach (string f2 in GetFullFileList(innerEx))
+                        output.Add(f + "|" + f2);
+
+                    innerEx.Dispose();
+                    str.Dispose();
+                }
+            }
+            return output;
+        }
+
         private void LoadFileList()
         {
             CurrentPosition = 0;
@@ -68,7 +91,7 @@ namespace comicReader.NET
             if (isArchive)
             {
                 using (SevenZipExtractor ex = new SevenZipExtractor(currentPath))
-                    FileNames = ex.ArchiveFileNames.ToList<string>();
+                    FileNames = GetFullFileList(ex);
                 SiblingCollections = new List<string>();
             }
             else
@@ -121,17 +144,22 @@ namespace comicReader.NET
             if (!isArchive)
                 output = File.ReadAllBytes(Path.Combine(currentPath, FileNames[CurrentPosition]));
             else
-                using (SevenZipExtractor ex = new SevenZipExtractor(currentPath))
+            {
+                Stream str = File.OpenRead(currentPath);
+                foreach (string fileName in (FileNames[CurrentPosition]).Split('|'))
                 {
-                    MemoryStream str = new MemoryStream();
-                    ex.ExtractFile(FileNames[CurrentPosition], str);
-                    output = str.ToArray();
+                    MemoryStream str2 = new MemoryStream();
+                    using (SevenZipExtractor ex = new SevenZipExtractor(str))
+                        ex.ExtractFile(fileName, str2);
+                    str = str2;
                 }
+                output = ((MemoryStream)str).ToArray();
+            }
 
             Debug.Print("File extraction time: " + DateTime.Now.Subtract(start).ToString());
             return output;
         }
-        
+
         public void MoveToNextFile()
         {
             CurrentPosition++;
