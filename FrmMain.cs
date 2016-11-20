@@ -367,7 +367,19 @@ namespace comicReader.NET
                     LoadCurrentFile();
                     ResizeImage();
                     break;
-
+                case Keys.E:
+                    string path = "h:\\tmp\\" + Path.GetFileName(currentArchiveReader.GetCurrentFileName());
+                    try
+                    {
+                        File.WriteAllBytes(path,
+                                           currentArchiveReader.GetCurrentFile());
+                        MessageBox.Show("Exported.");
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(ex.Message);
+                    }
+                    break;
                 default:
                     return;
             }
