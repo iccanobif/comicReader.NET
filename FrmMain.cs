@@ -233,6 +233,13 @@ namespace comicReader.NET
                     currentComic.Zoom *= 0.9;
                     ResizeImage();
                     break;
+                case Keys.NumPad0:
+                    if (currentComic.Zoom != 1)
+                    {
+                        currentComic.Zoom = 1;
+                        ResizeImage();
+                    }
+                    break;
                 //ARROW KEYS
                 case Keys.Down:
                     if (currentVerticalPosition <= maxVerticalOffset) return;
