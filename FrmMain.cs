@@ -266,18 +266,28 @@ namespace comicReader.NET
                     break;
                 // NAVIGATION KEYS
                 case Keys.Home:
-                    if (this.ClientSize.Height > resizedBitmap.Height) return;
-                    if (currentVerticalPosition < (maxVerticalOffset) / 2)
-                        currentVerticalPosition = (maxVerticalOffset) / 2;
-                    else
-                        currentVerticalPosition = 0;
-                    break;
                 case Keys.End:
-                    if (this.ClientSize.Height > resizedBitmap.Height) return;
-                    if (currentVerticalPosition > (maxVerticalOffset) / 2)
-                        currentVerticalPosition = (maxVerticalOffset) / 2;
-                    else
-                        currentVerticalPosition = maxVerticalOffset;
+                case Keys.Space:
+                    if (e.KeyCode == Keys.Home 
+                        || (e.KeyCode == Keys.Space && e.Shift))
+                    {
+                        //GO UP
+                        if (this.ClientSize.Height > resizedBitmap.Height) return;
+                        if (currentVerticalPosition < (maxVerticalOffset) / 2)
+                            currentVerticalPosition = (maxVerticalOffset) / 2;
+                        else
+                            currentVerticalPosition = 0;
+                    }
+                    if (e.KeyCode == Keys.End
+                        || (e.KeyCode == Keys.Space && !e.Shift))
+                    {
+                        //GO DOWN
+                        if (this.ClientSize.Height > resizedBitmap.Height) return;
+                        if (currentVerticalPosition > (maxVerticalOffset) / 2)
+                            currentVerticalPosition = (maxVerticalOffset) / 2;
+                        else
+                            currentVerticalPosition = maxVerticalOffset;
+                    }
                     break;
                 case Keys.NumPad4:
                     if (ClientSize.Height < resizedBitmap.Height)

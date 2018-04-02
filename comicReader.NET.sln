@@ -1,9 +1,9 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27004.2009
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "comicReader.NET", "comicReader.NET.csproj", "{56707418-0209-4679-B04D-6661F641EC0D}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{DB4A7E30-6565-4D1D-9B13-298F15A4B898}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8035627A-D715-4CED-B0C3-11C3156D93D9}"
 	ProjectSection(SolutionItems) = preProject
@@ -12,10 +12,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		TraceAndTestImpact.testsettings = TraceAndTestImpact.testsettings
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTestsNew\UnitTests.csproj", "{AAABABE5-59D1-4144-8723-64F2C80495B7}"
+EndProject
 Global
-	GlobalSection(TestCaseManagementSettings) = postSolution
-		CategoryFile = comicReader.NET.vsmdi
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|Mixed Platforms = Debug|Mixed Platforms
@@ -35,18 +34,26 @@ Global
 		{56707418-0209-4679-B04D-6661F641EC0D}.Release|Mixed Platforms.Build.0 = Release|x86
 		{56707418-0209-4679-B04D-6661F641EC0D}.Release|x86.ActiveCfg = Release|x86
 		{56707418-0209-4679-B04D-6661F641EC0D}.Release|x86.Build.0 = Release|x86
-		{DB4A7E30-6565-4D1D-9B13-298F15A4B898}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DB4A7E30-6565-4D1D-9B13-298F15A4B898}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DB4A7E30-6565-4D1D-9B13-298F15A4B898}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{DB4A7E30-6565-4D1D-9B13-298F15A4B898}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{DB4A7E30-6565-4D1D-9B13-298F15A4B898}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{DB4A7E30-6565-4D1D-9B13-298F15A4B898}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DB4A7E30-6565-4D1D-9B13-298F15A4B898}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DB4A7E30-6565-4D1D-9B13-298F15A4B898}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{DB4A7E30-6565-4D1D-9B13-298F15A4B898}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{DB4A7E30-6565-4D1D-9B13-298F15A4B898}.Release|x86.ActiveCfg = Release|Any CPU
+		{AAABABE5-59D1-4144-8723-64F2C80495B7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AAABABE5-59D1-4144-8723-64F2C80495B7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AAABABE5-59D1-4144-8723-64F2C80495B7}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{AAABABE5-59D1-4144-8723-64F2C80495B7}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{AAABABE5-59D1-4144-8723-64F2C80495B7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{AAABABE5-59D1-4144-8723-64F2C80495B7}.Debug|x86.Build.0 = Debug|Any CPU
+		{AAABABE5-59D1-4144-8723-64F2C80495B7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AAABABE5-59D1-4144-8723-64F2C80495B7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AAABABE5-59D1-4144-8723-64F2C80495B7}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{AAABABE5-59D1-4144-8723-64F2C80495B7}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{AAABABE5-59D1-4144-8723-64F2C80495B7}.Release|x86.ActiveCfg = Release|Any CPU
+		{AAABABE5-59D1-4144-8723-64F2C80495B7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {EE208184-A988-446D-A054-6154D3845E5A}
+	EndGlobalSection
+	GlobalSection(TestCaseManagementSettings) = postSolution
+		CategoryFile = comicReader.NET.vsmdi
 	EndGlobalSection
 EndGlobal
