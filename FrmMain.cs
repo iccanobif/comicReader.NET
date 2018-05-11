@@ -268,26 +268,8 @@ namespace comicReader.NET
                 case Keys.Home:
                 case Keys.End:
                 case Keys.Space:
-                    if (e.KeyCode == Keys.Home 
-                        || (e.KeyCode == Keys.Space && e.Shift))
-                    {
-                        //GO UP
-                        if (this.ClientSize.Height > resizedBitmap.Height) return;
-                        if (currentVerticalPosition < (maxVerticalOffset) / 2)
-                            currentVerticalPosition = (maxVerticalOffset) / 2;
-                        else
-                            currentVerticalPosition = 0;
-                    }
-                    if (e.KeyCode == Keys.End
-                        || (e.KeyCode == Keys.Space && !e.Shift))
-                    {
-                        //GO DOWN
-                        if (this.ClientSize.Height > resizedBitmap.Height) return;
-                        if (currentVerticalPosition > (maxVerticalOffset) / 2)
-                            currentVerticalPosition = (maxVerticalOffset) / 2;
-                        else
-                            currentVerticalPosition = maxVerticalOffset;
-                    }
+                case Keys.W:
+                    MoveHalfPageUpOrDown(e, maxVerticalOffset);
                     break;
                 case Keys.NumPad4:
                     if (ClientSize.Height < resizedBitmap.Height)
@@ -324,6 +306,7 @@ namespace comicReader.NET
                         currentHorizontalPosition = maxHorizontalOffset;
                     break;
                 // PAGE KEYS
+                case Keys.D:
                 case Keys.PageDown:
                     if (e.Shift)
                         currentArchiveReader.CurrentPosition = (new Random(DateTime.Now.Millisecond)).Next(currentArchiveReader.FileNames.Count - 1);
@@ -332,6 +315,7 @@ namespace comicReader.NET
                     LoadCurrentFile();
                     ResizeImage();
                     break;
+                case Keys.A:
                 case Keys.PageUp:
                     if (e.Shift)
                         currentArchiveReader.CurrentPosition = (new Random(DateTime.Now.Millisecond)).Next(currentArchiveReader.FileNames.Count - 1);
@@ -351,13 +335,22 @@ namespace comicReader.NET
                     break;
                 // LIBRARY STUFF
                 case Keys.S:
-                    if (!currentComic.Saved) return; //TODO: could open a popup for adding this new comic to the library, instead
+                    if (e.Control)
+                    {
+                        if (!currentComic.Saved) return; //TODO: could open a popup for adding this new comic to the library, instead
 
-                    currentLibrary.SaveComic(currentComic);
-                    osdText = "SAVED";
+                        currentLibrary.SaveComic(currentComic);
+                        osdText = "SAVED";
+                    }
+                    else
+                    {
+                        MoveHalfPageUpOrDown(e, maxVerticalOffset);
+                    }
+
                     break;
                 case Keys.C:
                     if (!currentComic.Saved) return;
+                    if (!e.Control) return;
 
                     try
                     {
@@ -385,6 +378,8 @@ namespace comicReader.NET
                     ResizeImage();
                     break;
                 case Keys.E:
+                    if (!e.Control) return;
+
                     string path = "h:\\tmp\\" + Path.GetFileName(currentArchiveReader.GetCurrentFileName());
                     try
                     {
@@ -404,6 +399,33 @@ namespace comicReader.NET
             RepaintAll();
 
             Debug.Print("Key handling over: " + DateTime.Now.Subtract(keyPressTime).ToString());
+        }
+
+        private void MoveHalfPageUpOrDown(KeyEventArgs e, int maxVerticalOffset)
+        {
+            if (e.KeyCode == Keys.Home
+                || e.KeyCode == Keys.W
+                || (e.KeyCode == Keys.Space && e.Shift))
+            {
+                //GO UP
+                if (this.ClientSize.Height > resizedBitmap.Height) return;
+                if (currentVerticalPosition < (maxVerticalOffset) / 2)
+                    currentVerticalPosition = (maxVerticalOffset) / 2;
+                else
+                    currentVerticalPosition = 0;
+            }
+            if (e.KeyCode == Keys.End
+                || e.KeyCode == Keys.S
+                || (e.KeyCode == Keys.Space && !e.Shift))
+            {
+                //GO DOWN
+                if (this.ClientSize.Height > resizedBitmap.Height) return;
+                if (currentVerticalPosition > (maxVerticalOffset) / 2)
+                    currentVerticalPosition = (maxVerticalOffset) / 2;
+                else
+                    currentVerticalPosition = maxVerticalOffset;
+            }
+            return;
         }
 
         private void FrmMain_MouseWheel(object sender, MouseEventArgs e)
@@ -560,16 +582,22 @@ namespace comicReader.NET
 
         private void FrmMain_DragDrop(object sender, DragEventArgs e)
         {
+            try
+            {
+                string[] filenames = (string[])e.Data.GetData(DataFormats.FileDrop);
 
-            string[] filenames = (string[])e.Data.GetData(DataFormats.FileDrop);
+                currentArchiveReader = new ArchiveReader(filenames[0], null);
 
-            currentArchiveReader = new ArchiveReader(filenames[0], null);
+                if (currentComic != null) currentArchiveReader.SetParentComic(currentComic);
 
-            if (currentComic != null) currentArchiveReader.SetParentComic(currentComic);
-
-            LoadCurrentFile();
-            ResizeImage();
-            RepaintAll();
+                LoadCurrentFile();
+                ResizeImage();
+                RepaintAll();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message + "\n" + ex.StackTrace, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void FrmMain_DragEnter(object sender, DragEventArgs e)
@@ -577,7 +605,5 @@ namespace comicReader.NET
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
                 e.Effect = DragDropEffects.Copy;
         }
-
-
     }
 }

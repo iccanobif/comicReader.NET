@@ -134,6 +134,7 @@
             this.BtnBrowse.TabIndex = 3;
             this.BtnBrowse.Text = "Browse";
             this.BtnBrowse.UseVisualStyleBackColor = true;
+            this.BtnBrowse.Click += new System.EventHandler(this.BtnBrowse_Click);
             // 
             // BtnDelete
             // 

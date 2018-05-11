@@ -155,5 +155,9 @@ namespace comicReader.NET
                 LstComics.SelectedIndex = LstComics.Items.Count - 1 > previousSelectedIndex ? previousSelectedIndex : LstComics.Items.Count - 1;
         }
 
+        private void BtnBrowse_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show("not implemented lol");
+        }
     }
 }
