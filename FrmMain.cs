@@ -8,6 +8,8 @@ using System.Text;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.IO;
+using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 
 namespace comicReader.NET
 {
@@ -34,12 +36,65 @@ namespace comicReader.NET
 
         Point? mouseDragStart;
         Point originalImagePosition;
+        bool displayNegative = false;
 
         public FrmMain()
         {
             InitializeComponent();
 
             currentComic = new Comic();
+        }
+
+        private Bitmap getNegative(Bitmap bmp)
+        {
+            Bitmap output = new Bitmap(bmp.Width, bmp.Height);
+            for (int x = 0; x < bmp.Width; x++)
+                for (int y = 0; y < bmp.Height; y++)
+                {
+                    Color originalPixel = bmp.GetPixel(x, y);
+                    Color newPixel = Color.FromArgb(originalPixel.A,
+                                                    255 - originalPixel.R,
+                                                    255 - originalPixel.G,
+                                                    255 - originalPixel.B);
+                    output.SetPixel(x, y, newPixel);
+                }
+            return output;
+        }
+
+        private Bitmap getNegativeUsingLockbits(Bitmap originalBitmap)
+        {
+            Bitmap processedBitmap = new Bitmap(originalBitmap);
+
+            BitmapData bitmapData = processedBitmap.LockBits(new Rectangle(0, 0, processedBitmap.Width, processedBitmap.Height), ImageLockMode.ReadWrite, processedBitmap.PixelFormat);
+
+            int bytesPerPixel = Bitmap.GetPixelFormatSize(processedBitmap.PixelFormat) / 8;
+            int byteCount = bitmapData.Stride * processedBitmap.Height;
+            byte[] pixels = new byte[byteCount];
+            IntPtr ptrFirstPixel = bitmapData.Scan0;
+            Marshal.Copy(ptrFirstPixel, pixels, 0, pixels.Length);
+            int heightInPixels = bitmapData.Height;
+            int widthInBytes = bitmapData.Width * bytesPerPixel;
+
+            for (int y = 0; y < heightInPixels; y++)
+            {
+                int currentLine = y * bitmapData.Stride;
+                for (int x = 0; x < widthInBytes; x += bytesPerPixel)
+                {
+                    int newBlue = 255 - pixels[currentLine + x];
+                    int newGreen = 255 - pixels[currentLine + x + 1];
+                    int newRed = 255 - pixels[currentLine + x + 2];
+
+                    // calculate new pixel value
+                    pixels[currentLine + x] = (byte)newBlue;
+                    pixels[currentLine + x + 1] = (byte)newGreen;
+                    pixels[currentLine + x + 2] = (byte)newRed;
+                }
+            }
+
+            // copy modified bytes back
+            Marshal.Copy(pixels, 0, ptrFirstPixel, pixels.Length);
+            processedBitmap.UnlockBits(bitmapData);
+            return processedBitmap;
         }
 
         public void ResizeImage()
@@ -55,7 +110,8 @@ namespace comicReader.NET
                 graphics.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
                 graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
 
-                graphics.DrawImage(originalBitmap, 0, 0, resizedBitmap.Width, resizedBitmap.Height);
+                graphics.DrawImage(displayNegative ? getNegativeUsingLockbits(originalBitmap): originalBitmap, 
+                                    0, 0, resizedBitmap.Width, resizedBitmap.Height);
 
                 //System.Drawing.Imaging.ImageAttributes attr = new System.Drawing.Imaging.ImageAttributes();
                 //System.Drawing.Imaging.ColorMatrix matrix = new System.Drawing.Imaging.ColorMatrix();
@@ -115,7 +171,7 @@ namespace comicReader.NET
                 }
             }
 
-        doneWithReading:
+            doneWithReading:
 
             Font f = new Font(FontFamily.GenericMonospace, 10, FontStyle.Bold);
 
@@ -392,6 +448,10 @@ namespace comicReader.NET
                         MessageBox.Show(ex.Message);
                     }
                     break;
+                case Keys.Z:
+                    displayNegative = !displayNegative;
+                    ResizeImage();
+                    break;
                 default:
                     return;
             }
@@ -508,6 +568,7 @@ namespace comicReader.NET
 
             //TODO
             if (currentDisplayMode != DisplayMode.Zoom) return;
+
 
             g.DrawImage(resizedBitmap, new Point(currentHorizontalPosition, currentVerticalPosition));
             g.FillRectangle(Brushes.Black, 0, 0, currentHorizontalPosition, this.ClientSize.Height);
