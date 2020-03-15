@@ -6,3 +6,5 @@ bin
 *.user
 TestResults
 deploy.bat
+.vs
+packages

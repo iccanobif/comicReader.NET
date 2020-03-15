@@ -281,10 +281,12 @@ namespace comicReader.NET
             switch (e.KeyCode)
             {
                 // ZOOM KEYS
+                case Keys.Oemplus:
                 case Keys.Add:
                     currentComic.Zoom *= 1.1;
                     ResizeImage();
                     break;
+                case Keys.OemMinus:
                 case Keys.Subtract:
                     currentComic.Zoom *= 0.9;
                     ResizeImage();
