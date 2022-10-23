@@ -20,6 +20,28 @@ namespace comicReader.NET
 
         public int Compare(string s1, string s2)
         {
+            s1 = s1.Replace("０", "0")
+                .Replace("１", "1")
+                .Replace("２", "2")
+                .Replace("３", "3")
+                .Replace("４", "4")
+                .Replace("５", "5")
+                .Replace("６", "6")
+                .Replace("７", "7")
+                .Replace("８", "8")
+                .Replace("９", "9");
+
+            s2 = s2.Replace("０", "0")
+                .Replace("１", "1")
+                .Replace("２", "2")
+                .Replace("３", "3")
+                .Replace("４", "4")
+                .Replace("５", "5")
+                .Replace("６", "6")
+                .Replace("７", "7")
+                .Replace("８", "8")
+                .Replace("９", "9");
+
             string[] splitted1 = (from s in Regex.Split(s1, @"([0-9]+|\.)") //split by groups of numeric characters and periods
                                   where !string.IsNullOrWhiteSpace(Regex.Replace(s.ToUpper(), @"[\[\]\(\)\-_ ]", "")) && s != "." //the idea here is to ignore spaces and periods, so that, for example, xxx15xx < xx15.5xx where x's are non numeric characters
                                   select Regex.Replace(s.ToUpper(), @"[\[\]\(\)\-_ ]", "") //clean characters i'd rather ignore in the comparison (whitespace, dashes, underscores...)
@@ -43,7 +65,7 @@ namespace comicReader.NET
             }
 
             int i = 0;
-            while (i < (splitted1.Length < splitted2.Length ? splitted1.Length : splitted2.Length) && splitted1[i] != string.Empty )
+            while (i < (splitted1.Length < splitted2.Length ? splitted1.Length : splitted2.Length) && splitted1[i] != string.Empty)
             {
                 if (IsNumber(splitted1[i]) && IsNumber(splitted2[i]))
                 {
@@ -82,5 +104,4 @@ namespace comicReader.NET
             return splitted1.Length - splitted2.Length;
         }
     }
-
 }

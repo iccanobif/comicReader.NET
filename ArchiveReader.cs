@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
-using SevenZip;
+using SevenZipExtractor;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
 //using SevenZip.Sdk;
@@ -19,7 +19,7 @@ namespace comicReader.NET
             Backwards
         }
 
-        public static Regex allowedImageExtensions = new Regex(@"\.(jpg|jpeg|png|gif|bmp|txt)$", RegexOptions.IgnoreCase);
+        public static Regex allowedImageExtensions = new Regex(@"\.(jpg|jpeg|png|gif|bmp|txt|avif)$", RegexOptions.IgnoreCase);
         public static Regex allowedArchiveExtensions = new Regex(@"\.(zip|rar|cbr|cbz|cbt|cba|cb7|7z)$", RegexOptions.IgnoreCase);
 
         Comic parentComic = null; //Can be null
@@ -59,21 +59,21 @@ namespace comicReader.NET
             parentComic.Position = CurrentPosition;
         }
 
-        private List<string> GetFullFileList(SevenZipExtractor e)
+        private List<string> GetFullFileList(ArchiveFile archive)
         {
             List<string> output = new List<string>();
-            foreach (string f in e.ArchiveFileNames)
+            foreach (var entry in archive.Entries)
             {
-                if (!allowedArchiveExtensions.IsMatch(f))
-                    output.Add(f);
+                if (!allowedArchiveExtensions.IsMatch(entry.FileName))
+                    output.Add(entry.FileName);
                 else
                 {
                     MemoryStream str = new MemoryStream();
-                    e.ExtractFile(f, str);
-                    SevenZipExtractor innerEx = new SevenZipExtractor(str);
+                    entry.Extract(str);
+                    var innerEx = new ArchiveFile(str);
 
                     foreach (string f2 in GetFullFileList(innerEx))
-                        output.Add(f + "|" + f2);
+                        output.Add(entry + "|" + f2);
 
                     innerEx.Dispose();
                     str.Dispose();
@@ -90,7 +90,7 @@ namespace comicReader.NET
 
             if (isArchive)
             {
-                using (SevenZipExtractor ex = new SevenZipExtractor(currentPath))
+                using (ArchiveFile ex = new ArchiveFile(currentPath))
                     FileNames = GetFullFileList(ex);
                 SiblingCollections = new List<string>();
             }
@@ -124,9 +124,9 @@ namespace comicReader.NET
                                      select names).ToList<string>();
             else
                 if (Directory.GetDirectoryRoot(currentPath) == currentPath)
-                    ParentCollections = new List<string>();
-                else
-                    ParentCollections = Directory.GetDirectories(Path.GetDirectoryName(currentPath)).ToList<string>();
+                ParentCollections = new List<string>();
+            else
+                ParentCollections = Directory.GetDirectories(Path.GetDirectoryName(currentPath)).ToList<string>();
 
             ParentCollections.Sort(new NaturalComparer());
         }
@@ -149,8 +149,10 @@ namespace comicReader.NET
                 foreach (string fileName in (FileNames[CurrentPosition]).Split('|'))
                 {
                     MemoryStream str2 = new MemoryStream();
-                    using (SevenZipExtractor ex = new SevenZipExtractor(str))
-                        ex.ExtractFile(fileName, str2);
+                    using (ArchiveFile ex = new ArchiveFile(str))
+                    {
+                        ex.Entries.First(e => e.FileName == fileName).Extract(str2);
+                    }
                     str = str2;
                 }
                 output = ((MemoryStream)str).ToArray();

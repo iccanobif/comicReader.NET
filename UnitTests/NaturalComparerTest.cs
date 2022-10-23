@@ -1,6 +1,5 @@
 ﻿using comicReader.NET;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
 
 namespace UnitTests
 {
@@ -146,8 +145,16 @@ namespace UnitTests
         public void CompareTest16()
         {
             NaturalComparer target = new NaturalComparer();
-            Assert.IsTrue(target.Compare(@"[瀬戸口みづき] ローカル女子の遠吠え【電子限定版】　２巻_00080.jpg",
-                                            @"[瀬戸口みづき] ローカル女子の遠吠え【電子限定版】　２巻_00001.jpg") < 0);
+            Assert.IsTrue(target.Compare(@"[瀬戸口みづき] ローカル女子の遠吠え【電子限定版】　２巻_00001.jpg",
+                                         @"[瀬戸口みづき] ローカル女子の遠吠え【電子限定版】　２巻_00080.jpg") < 0);
+        }
+
+        [TestMethod()]
+        public void CompareTest17()
+        {
+            NaturalComparer target = new NaturalComparer();
+            Assert.IsTrue(target.Compare(@"封神演義\\第０１巻[藤崎竜]\\0128.jpg",
+                                         @"封神演義\\第０１巻[藤崎竜]\\0033.jpg") > 0);
         }
     }
 }
