@@ -57,7 +57,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\comicReader.NET.csproj">
+    <ProjectReference Include="..\comicReader.NET\comicReader.NET.csproj">
       <Project>{56707418-0209-4679-B04D-6661F641EC0D}</Project>
       <Name>comicReader.NET</Name>
     </ProjectReference>
